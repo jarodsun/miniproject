@@ -1,13 +1,118 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
                              QLabel, QComboBox, QGroupBox, QFormLayout, QMessageBox)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPainter, QPen, QColor, QBrush
 from datetime import datetime, timedelta
 import random
 
 # 暂时禁用matplotlib的Qt组件，避免启动时冲突
 MATPLOTLIB_AVAILABLE = False
-print("警告: 暂时禁用matplotlib图表功能，使用文本图表模式")
+print("警告: 暂时禁用matplotlib图表功能，使用PyQt5原生折线图")
+
+
+class LineChartWidget(QWidget):
+    """自定义折线图组件"""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.data = {}
+        self.title = ""
+        self.setMinimumSize(800, 400)
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
+                border-radius: 8px;
+            }
+        """)
+    
+    def set_data(self, title, data):
+        """设置图表数据"""
+        self.title = title
+        self.data = data
+        self.update()
+    
+    def paintEvent(self, event):
+        """绘制折线图"""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        
+        # 设置背景
+        painter.fillRect(self.rect(), QColor("#2d2d2d"))
+        
+        if not self.data:
+            return
+        
+        # 获取数据
+        months = list(self.data.keys())
+        values = list(self.data.values())
+        
+        if not values:
+            return
+        
+        # 计算绘图区域
+        margin = 60
+        chart_rect = self.rect().adjusted(margin, margin, -margin, -margin)
+        
+        # 绘制标题
+        painter.setPen(QColor("#ffffff"))
+        painter.setFont(QFont("Microsoft YaHei", 14, QFont.Bold))
+        painter.drawText(self.rect().adjusted(0, 10, 0, 0), Qt.AlignCenter, self.title)
+        
+        # 计算坐标轴
+        max_value = max(values)
+        min_value = min(values)
+        value_range = max_value - min_value if max_value != min_value else 1
+        
+        # 绘制网格线
+        painter.setPen(QPen(QColor("#404040"), 1, Qt.DashLine))
+        for i in range(6):
+            y = int(chart_rect.top() + (chart_rect.height() * i / 5))
+            painter.drawLine(chart_rect.left(), y, chart_rect.right(), y)
+        
+        # 绘制Y轴标签
+        painter.setPen(QColor("#ffffff"))
+        painter.setFont(QFont("Microsoft YaHei", 10))
+        for i in range(6):
+            value = max_value - (value_range * i / 5)
+            y = int(chart_rect.top() + (chart_rect.height() * i / 5))
+            painter.drawText(chart_rect.left() - 50, y + 5, f"{int(value)}")
+        
+        # 绘制X轴标签
+        for i, month in enumerate(months):
+            x = int(chart_rect.left() + (chart_rect.width() * i / (len(months) - 1)))
+            painter.drawText(x - 15, chart_rect.bottom() + 20, month)
+        
+        # 绘制折线
+        if len(values) > 1:
+            painter.setPen(QPen(QColor("#007bff"), 3))
+            points = []
+            for i, value in enumerate(values):
+                x = int(chart_rect.left() + (chart_rect.width() * i / (len(values) - 1)))
+                y = int(chart_rect.bottom() - ((value - min_value) / value_range * chart_rect.height()))
+                points.append((x, y))
+            
+            # 绘制线条
+            for i in range(len(points) - 1):
+                painter.drawLine(points[i][0], points[i][1], points[i+1][0], points[i+1][1])
+            
+            # 绘制数据点
+            painter.setBrush(QBrush(QColor("#007bff")))
+            painter.setPen(QPen(QColor("#ffffff"), 2))
+            for x, y in points:
+                painter.drawEllipse(x - 4, y - 4, 8, 8)
+            
+            # 高亮最高点
+            max_index = values.index(max_value)
+            max_x, max_y = points[max_index]
+            painter.setBrush(QBrush(QColor("#ff4444")))
+            painter.setPen(QPen(QColor("#ffffff"), 3))
+            painter.drawEllipse(max_x - 6, max_y - 6, 12, 12)
+            
+            # 标注最高点
+            painter.setPen(QColor("#ff4444"))
+            painter.setFont(QFont("Microsoft YaHei", 10, QFont.Bold))
+            painter.drawText(max_x + 10, max_y - 10, f"最高: {max_value}箱")
 
 
 class AnalysisModule(QWidget):
@@ -75,52 +180,19 @@ class AnalysisModule(QWidget):
         """创建图表区域"""
         try:
             print("create_chart_area: 开始创建图表区域...")
-            if MATPLOTLIB_AVAILABLE:
-                print("create_chart_area: matplotlib可用，尝试创建图表组件...")
-                try:
-                    # 延迟导入Qt相关组件
-                    print("create_chart_area: 导入matplotlib Qt组件...")
-                    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-                    from matplotlib.figure import Figure
-                    print("create_chart_area: matplotlib Qt组件导入成功")
-                    
-                    # 创建matplotlib图表
-                    print("create_chart_area: 创建Figure...")
-                    self.figure = Figure(figsize=(12, 6), dpi=100)
-                    print("create_chart_area: Figure创建完成")
-                    
-                    print("create_chart_area: 创建Canvas...")
-                    self.canvas = FigureCanvas(self.figure)
-                    print("create_chart_area: Canvas创建完成")
-                    
-                    # 设置图表样式
-                    print("create_chart_area: 设置图表样式...")
-                    self.canvas.setStyleSheet("""
-                        QWidget {
-                            background-color: transparent;
-                            border: 1px solid #ddd;
-                            border-radius: 8px;
-                        }
-                    """)
-                    print("create_chart_area: 图表样式设置完成")
-                    
-                    print("create_chart_area: 添加Canvas到布局...")
-                    parent_layout.addWidget(self.canvas)
-                    print("create_chart_area: Canvas添加到布局完成")
-                    
-                    print("matplotlib图表组件创建成功")
-                except Exception as e:
-                    print(f"matplotlib图表组件创建失败: {e}")
-                    import traceback
-                    traceback.print_exc()
-                    # 降级到文本模式
-                    print("create_chart_area: 降级到文本模式...")
-                    self._create_text_chart_area(parent_layout)
-            else:
-                print("create_chart_area: matplotlib不可用，使用文本模式...")
-                # 备选方案：使用QLabel显示图表信息
-                self._create_text_chart_area(parent_layout)
-                
+            
+            # 创建自定义折线图组件
+            print("create_chart_area: 创建PyQt5原生折线图...")
+            self.line_chart = LineChartWidget()
+            print("create_chart_area: 折线图组件创建完成")
+            
+            # 添加到布局
+            print("create_chart_area: 添加折线图到布局...")
+            parent_layout.addWidget(self.line_chart)
+            print("create_chart_area: 折线图添加到布局完成")
+            
+            # 初始显示空图表
+            self.show_empty_chart()
             print("create_chart_area: 图表区域创建完成")
             
         except Exception as e:
@@ -149,19 +221,9 @@ class AnalysisModule(QWidget):
     
     def show_empty_chart(self):
         """显示空图表"""
-        if MATPLOTLIB_AVAILABLE:
-            self.figure.clear()
-            ax = self.figure.add_subplot(111)
-            ax.text(0.5, 0.5, '点击"生成分析报告"按钮\n生成12个月采购趋势图表', 
-                   ha='center', va='center', fontsize=14, 
-                   bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgray", alpha=0.5))
-            ax.set_xlim(0, 1)
-            ax.set_ylim(0, 1)
-            ax.axis('off')
-            self.canvas.draw()
-        else:
-            if hasattr(self, 'chart_label'):
-                self.chart_label.setText("📈 图表区域\n\n点击'生成分析报告'按钮\n生成12个月采购趋势图表")
+        if hasattr(self, 'line_chart'):
+            # 显示空数据提示
+            self.line_chart.set_data("点击'生成分析报告'按钮生成12个月采购趋势图表", {})
     
     def create_statistics_area(self, parent_layout):
         """创建统计信息区域"""
@@ -289,53 +351,22 @@ class AnalysisModule(QWidget):
     
     def create_line_chart(self, merchant, year, monthly_data):
         """创建12个月折线图"""
-        if MATPLOTLIB_AVAILABLE and hasattr(self, 'figure') and hasattr(self, 'canvas'):
-            try:
-                self.figure.clear()
-                ax = self.figure.add_subplot(111)
-                
-                # 准备数据
-                months = list(monthly_data.keys())
-                values = list(monthly_data.values())
-                
-                # 创建折线图
-                ax.plot(months, values, marker='o', linewidth=2, markersize=6, 
-                        color='#007bff', markerfacecolor='#007bff', markeredgecolor='white', markeredgewidth=2)
-                
-                # 设置图表样式
-                ax.set_title(f'{merchant} - {year}年12个月采购趋势', fontsize=14, fontweight='bold', pad=20)
-                ax.set_xlabel('月份', fontsize=12)
-                ax.set_ylabel('采购数量 (箱)', fontsize=12)
-                
-                # 设置网格
-                ax.grid(True, alpha=0.3, linestyle='--')
-                
-                # 设置x轴标签旋转
-                ax.tick_params(axis='x', rotation=45)
-                
-                # 高亮最高点
-                max_value = max(values)
-                max_index = values.index(max_value)
-                ax.annotate(f'最高: {max_value}箱', 
-                           xy=(max_index, max_value), xytext=(max_index, max_value + 20),
-                           arrowprops=dict(arrowstyle='->', color='red', lw=2),
-                           fontsize=10, ha='center', color='red', fontweight='bold')
-                
-                # 设置y轴从0开始
-                ax.set_ylim(bottom=0)
-                
-                # 调整布局
-                self.figure.tight_layout()
-                
-                # 刷新画布
-                self.canvas.draw()
-                print("matplotlib折线图创建成功")
-            except Exception as e:
-                print(f"matplotlib折线图创建失败: {e}")
-                # 降级到文本模式
+        try:
+            print("create_line_chart: 开始创建折线图...")
+            if hasattr(self, 'line_chart'):
+                # 使用自定义折线图组件
+                title = f"{merchant} - {year}年12个月采购趋势"
+                self.line_chart.set_data(title, monthly_data)
+                print("create_line_chart: PyQt5折线图创建成功")
+            else:
+                print("create_line_chart: 折线图组件不存在，降级到文本模式")
                 self.show_text_chart(merchant, year, monthly_data)
-        else:
-            # 备选方案：显示文本格式的图表数据
+                
+        except Exception as e:
+            print(f"create_line_chart失败: {e}")
+            import traceback
+            traceback.print_exc()
+            # 降级到文本模式
             self.show_text_chart(merchant, year, monthly_data)
     
     def show_text_chart(self, merchant, year, monthly_data):
