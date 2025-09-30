@@ -11,6 +11,9 @@ class MerchantsModule(QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
+        # 延迟应用主题，确保所有组件都已创建
+        from PyQt5.QtCore import QTimer
+        QTimer.singleShot(0, self.apply_initial_theme)
     
     def init_ui(self):
         layout = QVBoxLayout()
@@ -25,18 +28,7 @@ class MerchantsModule(QWidget):
         
         # 添加商家按钮
         add_btn = QPushButton("添加商家")
-        add_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #007acc;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-            }
-            QPushButton:hover {
-                background-color: #005a9e;
-            }
-        """)
+        # 按钮样式将在主题中设置
         add_btn.clicked.connect(self.show_add_merchant_dialog)
         title_layout.addWidget(add_btn)
         
@@ -46,7 +38,7 @@ class MerchantsModule(QWidget):
         search_layout = QHBoxLayout()
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("搜索商家...")
-        self.search_input.setStyleSheet("padding: 8px; border: 1px solid #ddd; border-radius: 4px;")
+        # 输入框样式将在主题中设置
         self.search_input.textChanged.connect(self.filter_merchants)
         search_layout.addWidget(self.search_input)
         search_layout.addStretch()
@@ -103,3 +95,51 @@ class MerchantsModule(QWidget):
             # 这里可以添加保存逻辑
             QMessageBox.information(self, "成功", "商家添加成功！")
             self.populate_merchants_table()  # 刷新表格
+    
+    def apply_initial_theme(self):
+        """应用初始主题"""
+        # 使用默认深色主题
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
+            QLabel {
+                color: #ffffff;
+            }
+            QPushButton {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #0056b3;
+            }
+            QLineEdit {
+                border: 1px solid #404040;
+                padding: 8px;
+                background-color: #2d2d2d;
+                color: #ffffff;
+            }
+            QTableWidget {
+                background-color: #2d2d2d;
+                alternate-background-color: #404040;
+                gridline-color: #404040;
+                color: #ffffff;
+            }
+            QTableWidget::item {
+                padding: 8px;
+            }
+            QTableWidget::item:selected {
+                background-color: #007bff;
+                color: white;
+            }
+            QHeaderView::section {
+                background-color: #404040;
+                color: #ffffff;
+                padding: 8px;
+                border: none;
+            }
+        """)

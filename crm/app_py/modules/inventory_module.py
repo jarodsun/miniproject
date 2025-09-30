@@ -10,6 +10,9 @@ class InventoryModule(QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
+        # 延迟应用主题，确保所有组件都已创建
+        from PyQt5.QtCore import QTimer
+        QTimer.singleShot(0, self.apply_initial_theme)
     
     def init_ui(self):
         layout = QVBoxLayout()
@@ -204,4 +207,83 @@ class InventoryModule(QWidget):
         end_date = self.end_date.date().toString("yyyy-MM-dd")
         
         QMessageBox.information(self, "查询", f"查询日期范围：{start_date} 到 {end_date}\n\n这里将显示查询结果")
+    
+    def apply_initial_theme(self):
+        """应用初始主题"""
+        # 使用默认深色主题
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
+            QLabel {
+                color: #ffffff;
+            }
+            QPushButton {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #0056b3;
+            }
+            QLineEdit, QSpinBox, QDateEdit, QTextEdit {
+                border: 1px solid #404040;
+                padding: 8px;
+                background-color: #2d2d2d;
+                color: #ffffff;
+            }
+            QComboBox {
+                border: 1px solid #404040;
+                padding: 8px;
+                background-color: #2d2d2d;
+                color: #ffffff;
+            }
+            QTableWidget {
+                background-color: #2d2d2d;
+                alternate-background-color: #404040;
+                gridline-color: #404040;
+                color: #ffffff;
+            }
+            QTableWidget::item {
+                padding: 8px;
+            }
+            QTableWidget::item:selected {
+                background-color: #007bff;
+                color: white;
+            }
+            QHeaderView::section {
+                background-color: #404040;
+                color: #ffffff;
+                padding: 8px;
+                border: none;
+            }
+            QGroupBox {
+                color: #ffffff;
+                border: 1px solid #404040;
+                border-radius: 4px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+            }
+            QTabWidget::pane {
+                border: 1px solid #404040;
+                background-color: #2d2d2d;
+            }
+            QTabBar::tab {
+                background-color: #404040;
+                color: #ffffff;
+                padding: 8px 16px;
+                margin-right: 2px;
+            }
+            QTabBar::tab:selected {
+                background-color: #007bff;
+            }
+        """)
         self.populate_records_table()  # 刷新表格

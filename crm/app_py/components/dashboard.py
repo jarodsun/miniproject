@@ -22,7 +22,7 @@ class DashboardWidget(QWidget):
         welcome_label = QLabel("欢迎使用 Mini CRM 客户关系管理系统")
         welcome_label.setFont(QFont("Microsoft YaHei", 12))
         welcome_label.setAlignment(Qt.AlignCenter)
-        welcome_label.setStyleSheet("color: #666; padding: 20px;")
+        welcome_label.setStyleSheet("padding: 20px;")
         layout.addWidget(welcome_label)
         
         # 功能卡片
@@ -51,17 +51,7 @@ class DashboardWidget(QWidget):
         """创建信息卡片"""
         card = QFrame()
         card.setFrameStyle(QFrame.StyledPanel)
-        card.setStyleSheet("""
-            QFrame {
-                background-color: white;
-                border: 1px solid #ddd;
-                padding: 20px;
-            }
-            QFrame:hover {
-                border-color: #007acc;
-                background-color: #f8f9fa;
-            }
-        """)
+        # 卡片样式将在主题中设置
         card.setCursor(Qt.PointingHandCursor)
         
         layout = QVBoxLayout()
@@ -83,7 +73,6 @@ class DashboardWidget(QWidget):
         desc_label = QLabel(description)
         desc_label.setFont(QFont("Microsoft YaHei", 10))
         desc_label.setAlignment(Qt.AlignCenter)
-        desc_label.setStyleSheet("color: #666;")
         layout.addWidget(desc_label)
         
         return card
