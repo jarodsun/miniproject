@@ -24,9 +24,17 @@ function ButtonField(props: ButtonFieldProps) {
       ? parsedFormat
       : pickerContext.value.format(pickerContext.fieldFormat);
 
+  // 过滤掉不应该传递给 DOM 的属性
+  const buttonProps = { ...forwardedProps };
+  // 移除 Material-UI 特定的属性，这些属性不应该传递给 DOM 元素
+  const propsToRemove = ['slotProps', 'inputRef', 'slots', 'open', 'onOpen', 'onClose'];
+  propsToRemove.forEach(prop => {
+    delete (buttonProps as any)[prop];
+  });
+
   return (
     <Button
-      {...forwardedProps}
+      {...buttonProps}
       variant="outlined"
       ref={handleRef}
       size="small"
