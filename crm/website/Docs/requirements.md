@@ -114,7 +114,7 @@
 ### **3.1 技术栈架构**
 
 #### **3.1.1 前端技术栈**
-*   **框架：** Next.js 15 (App Router)
+*   **框架：** Next.js 15 (App Router + Pages Router)
 *   **UI 库：** Material-UI v7
 *   **样式：** Emotion + Tailwind CSS
 *   **状态管理：** React Context + Hooks
@@ -125,7 +125,7 @@
 #### **3.1.2 后端技术栈**
 *   **数据库：** SQLite (轻量级嵌入式数据库)
 *   **ORM：** Prisma (现代化数据库工具包)
-*   **API：** Next.js API Routes
+*   **API：** Next.js API Routes (Pages Router模式)
 *   **认证：** JWT 认证
 *   **密码加密：** bcryptjs (安全的密码哈希算法)
 *   **文件存储：** 本地文件系统
@@ -140,15 +140,72 @@
 ```bash
 # 核心依赖
 npm install prisma @prisma/client
-npm install bcryptjs
-npm install @types/bcryptjs --save-dev
+npm install bcryptjs jsonwebtoken
+npm install @types/bcryptjs @types/jsonwebtoken --save-dev
 
 # 数据库迁移
 npx prisma generate
 npx prisma migrate dev --name init
 ```
 
-### **3.2 数据库设计**
+#### **3.1.5 环境变量配置**
+```bash
+# 生成JWT密钥
+openssl rand -base64 32
+
+# 生成NextAuth密钥
+openssl rand -base64 32
+
+# 一键生成环境变量文件
+echo "JWT_SECRET=$(openssl rand -base64 32)" >> .env.local
+echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" >> .env.local
+echo "DATABASE_URL=\"file:./dev.db\"" >> .env.local
+echo "NEXTAUTH_URL=\"http://localhost:3000\"" >> .env.local
+```
+
+#### **3.1.6 API开发模式**
+*   **API路由：** 使用 Next.js Pages Router 模式开发 RESTful API
+*   **认证系统：** JWT + bcryptjs 提供安全的用户认证
+*   **数据库操作：** Prisma ORM 提供类型安全的数据库查询
+*   **错误处理：** 统一的错误响应格式和状态码
+*   **安全特性：** 密码加密、会话管理、令牌验证
+
+### **3.2 项目结构**
+
+#### **3.2.1 目录结构**
+```
+crm/website/
+├── app/                          # Next.js App Router (前端页面)
+│   ├── components/               # 共享组件
+│   ├── dashboard/               # 仪表板模块
+│   ├── shared-theme/            # 主题配置
+│   └── page.tsx                 # 首页 (登录页)
+├── pages/                        # Next.js Pages Router (API路由)
+│   ├── api/                     # API接口
+│   │   └── auth/                # 认证相关API
+│   │       ├── login.ts         # 用户登录API
+│   │       ├── logout.ts        # 用户登出API
+│   │       └── verify.ts        # 令牌验证API
+│   └── api-test.tsx             # API测试页面
+├── prisma/                      # 数据库配置
+│   ├── schema.prisma            # 数据库模式
+│   └── seed.ts                  # 种子数据
+├── Docs/                        # 项目文档
+│   ├── requirements.md          # 需求文档
+│   ├── database-design.md       # 数据库设计
+│   └── README.md                # 项目说明
+├── package.json                 # 项目配置
+├── env.example                  # 环境变量示例
+└── tsconfig.json               # TypeScript配置
+```
+
+#### **3.2.2 架构说明**
+*   **前端架构：** 使用 Next.js App Router 构建现代化前端应用
+*   **API架构：** 使用 Next.js Pages Router 模式开发 RESTful API
+*   **数据库架构：** SQLite + Prisma ORM 提供类型安全的数据库操作
+*   **认证架构：** JWT + bcryptjs 提供安全的用户认证系统
+
+### **3.3 数据库设计**
 详细的数据库设计请参考：[数据库设计文档](./database-design.md)
 
 **主要技术选型：**
@@ -198,10 +255,10 @@ npx prisma migrate dev --name init
 
 ---
 
-**文档版本：** v1.3  
+**文档版本：** v1.5  
 **创建日期：** 2025年10月5日  
 **最后更新：** 2025年10月5日  
-**更新内容：** 添加密码加密技术栈和依赖管理说明
+**更新内容：** 添加OpenSSL密钥生成命令和环境变量配置说明
 
 ## **相关文档**
 - [数据库设计文档](./database-design.md) - 详细的数据库设计和配置说明
