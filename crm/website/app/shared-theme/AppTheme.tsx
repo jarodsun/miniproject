@@ -55,9 +55,34 @@ export default function AppTheme(props: AppThemeProps) {
     return <React.Fragment>{children}</React.Fragment>;
   }
 
-  // 在服务器端渲染时，返回一个简单的容器避免 hydration 不匹配
+  // 在服务器端渲染时，使用默认主题避免闪烁
   if (!mounted) {
-    return <div suppressHydrationWarning>{children}</div>;
+    const defaultTheme = createTheme({
+      cssVariables: {
+        colorSchemeSelector: 'data-mui-color-scheme',
+        cssVarPrefix: 'template',
+      },
+      colorSchemes,
+      typography,
+      shadows,
+      shape,
+      components: {
+        ...inputsCustomizations,
+        ...dataDisplayCustomizations,
+        ...feedbackCustomizations,
+        ...navigationCustomizations,
+        ...surfacesCustomizations,
+        ...themeComponents,
+      },
+    });
+    
+    return (
+      <ThemeProvider theme={defaultTheme} disableTransitionOnChange>
+        <div suppressHydrationWarning>
+          {children}
+        </div>
+      </ThemeProvider>
+    );
   }
 
   return (

@@ -12,8 +12,22 @@ export default function ColorModeSelect(props: SelectProps) {
     setMounted(true);
   }, []);
 
-  // 在服务器端或未挂载时返回 null，避免 hydration 不匹配
-  if (!mounted || !mode) {
+  // 在服务器端渲染时，返回一个占位符避免布局偏移
+  if (!mounted) {
+    return (
+      <Select
+        value="system"
+        disabled
+        sx={{ opacity: 0.7 }}
+        {...props}
+      >
+        <MenuItem value="system">System</MenuItem>
+      </Select>
+    );
+  }
+
+  // 如果模式未设置，使用默认值
+  if (!mode) {
     return null;
   }
 
