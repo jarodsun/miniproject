@@ -5,9 +5,18 @@ import Select, { SelectProps } from '@mui/material/Select';
 
 export default function ColorModeSelect(props: SelectProps) {
   const { mode, setMode } = useColorScheme();
-  if (!mode) {
+  const [mounted, setMounted] = React.useState(false);
+
+  // 确保组件只在客户端挂载后渲染
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 在服务器端或未挂载时返回 null，避免 hydration 不匹配
+  if (!mounted || !mode) {
     return null;
   }
+
   return (
     <Select
       value={mode}

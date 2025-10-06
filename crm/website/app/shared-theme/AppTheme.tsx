@@ -20,6 +20,13 @@ interface AppThemeProps {
 
 export default function AppTheme(props: AppThemeProps) {
   const { children, disableCustomTheme, themeComponents } = props;
+  const [mounted, setMounted] = React.useState(false);
+
+  // 确保组件只在客户端挂载后渲染
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const theme = React.useMemo(() => {
     return disableCustomTheme
       ? {}
@@ -43,9 +50,16 @@ export default function AppTheme(props: AppThemeProps) {
           },
         });
   }, [disableCustomTheme, themeComponents]);
+
   if (disableCustomTheme) {
     return <React.Fragment>{children}</React.Fragment>;
   }
+
+  // 在服务器端渲染时，返回一个简单的容器避免 hydration 不匹配
+  if (!mounted) {
+    return <div suppressHydrationWarning>{children}</div>;
+  }
+
   return (
     <ThemeProvider theme={theme} disableTransitionOnChange>
       {children}
