@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import type {} from '@mui/x-date-pickers/themeAugmentation';
 import type {} from '@mui/x-charts/themeAugmentation';
 // import type {} from '@mui/x-data-grid-pro/themeAugmentation';
@@ -9,11 +10,13 @@ import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+import CircularProgress from '@mui/material/CircularProgress';
 import AppNavbar from './components/AppNavbar';
 import Header from './components/Header';
 import MainGrid from './components/MainGrid';
 import SideMenu from './components/SideMenu';
 import AppTheme from '../shared-theme/AppTheme';
+import { useAuth } from '../hooks/useAuth';
 import {
   chartsCustomizations,
   dataGridCustomizations,
@@ -29,6 +32,34 @@ const xThemeComponents = {
 };
 
 export default function Dashboard(props: { disableCustomTheme?: boolean }) {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // 如果正在加载，显示加载状态
+  if (isLoading) {
+    return (
+      <AppTheme {...props} themeComponents={xThemeComponents}>
+        <CssBaseline enableColorScheme />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </AppTheme>
+    );
+  }
+
+  // 如果未认证，重定向到登录页面
+  if (!isAuthenticated) {
+    router.push('/');
+    return null;
+  }
+
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
