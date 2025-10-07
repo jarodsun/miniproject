@@ -395,7 +395,6 @@ export default function MerchantsPage(props: { disableCustomTheme?: boolean }) {
               fullWidth
               label="地址"
               multiline
-              rows={3}
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             />
