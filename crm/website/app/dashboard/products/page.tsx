@@ -37,11 +37,15 @@ import {
   InputAdornment,
   Pagination,
   Alert,
+  Chip,
 } from '@mui/material';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Inventory as InventoryIcon,
+  TrendingUp as TrendingUpIcon,
+  TrendingDown as TrendingDownIcon,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
 
 interface Product {
@@ -68,7 +72,6 @@ export default function ProductsPage() {
     name: '',
     specification: '',
     unit: '',
-    currentStock: 0,
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -115,6 +118,16 @@ export default function ProductsPage() {
     router.push('/dashboard');
   };
 
+  const getStockStatus = (stock: number) => {
+    if (stock === 0) {
+      return { label: '零库存', color: 'error' as const, icon: <WarningIcon /> };
+    } else if (stock < 10) {
+      return { label: '库存不足', color: 'warning' as const, icon: <TrendingDownIcon /> };
+    } else {
+      return { label: '库存充足', color: 'success' as const, icon: <TrendingUpIcon /> };
+    }
+  };
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
     setCurrentPage(1);
@@ -127,7 +140,6 @@ export default function ProductsPage() {
         name: product.name,
         specification: product.specification,
         unit: product.unit,
-        currentStock: product.currentStock,
       });
     } else {
       setEditingProduct(null);
@@ -135,7 +147,6 @@ export default function ProductsPage() {
         name: '',
         specification: '',
         unit: '',
-        currentStock: 0,
       });
     }
     setOpenDialog(true);
@@ -148,7 +159,6 @@ export default function ProductsPage() {
       name: '',
       specification: '',
       unit: '',
-      currentStock: 0,
     });
   };
 
@@ -242,7 +252,7 @@ export default function ProductsPage() {
               货品管理
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              管理商品信息、库存、价格等
+              管理货品基础信息（名称、规格、单位、图片等）
             </Typography>
           </Box>
 
@@ -280,6 +290,17 @@ export default function ProductsPage() {
               >
                 添加货品
               </Button>
+              <Button
+                variant="outlined"
+                startIcon={<InventoryIcon />}
+                onClick={() => router.push('/dashboard/inventory')}
+                sx={{ 
+                  whiteSpace: 'nowrap',
+                  px: 2
+                }}
+              >
+                库存管理
+              </Button>
             </Box>
 
             {/* 货品列表 */}
@@ -296,6 +317,7 @@ export default function ProductsPage() {
                       <TableCell>规格</TableCell>
                       <TableCell>单位</TableCell>
                       <TableCell>当前库存</TableCell>
+                      <TableCell>库存状态</TableCell>
                       <TableCell>操作</TableCell>
                     </TableRow>
                   </TableHead>
@@ -312,7 +334,20 @@ export default function ProductsPage() {
                         </TableCell>
                         <TableCell>{product.specification}</TableCell>
                         <TableCell>{product.unit}</TableCell>
-                        <TableCell>{product.currentStock}</TableCell>
+                        <TableCell>
+                          <Typography variant="body2" fontWeight={600}>
+                            {product.currentStock}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            icon={getStockStatus(product.currentStock).icon}
+                            label={getStockStatus(product.currentStock).label}
+                            color={getStockStatus(product.currentStock).color}
+                            size="small"
+                            variant="outlined"
+                          />
+                        </TableCell>
                         <TableCell>
                           <IconButton
                             size="small"
@@ -370,21 +405,13 @@ export default function ProductsPage() {
               value={formData.specification}
               onChange={(e) => setFormData({ ...formData, specification: e.target.value })}
             />
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                fullWidth
-                label="单位"
-                value={formData.unit}
-                onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-              />
-              <TextField
-                fullWidth
-                label="当前库存"
-                type="number"
-                value={formData.currentStock}
-                onChange={(e) => setFormData({ ...formData, currentStock: Number(e.target.value) })}
-              />
-            </Box>
+            <TextField
+              fullWidth
+              label="单位"
+              value={formData.unit}
+              onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              placeholder="如：个、箱、包等"
+            />
           </Box>
         </DialogContent>
         <DialogActions>
