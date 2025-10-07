@@ -365,63 +365,12 @@ export const inputsCustomizations: Components<Theme> = {
   },
   MuiInputBase: {
     styleOverrides: {
-      root: {
-        border: 'none',
-      },
-      input: {
-        '&::placeholder': {
-          opacity: 0.7,
-          color: gray[500],
-        },
-      },
+      // 清除自定义样式，使用原生 Material-UI 样式
     },
   },
   MuiOutlinedInput: {
     styleOverrides: {
-      input: {
-        padding: 0,
-      },
-      root: ({ theme }) => ({
-        padding: '8px 12px',
-        color: (theme.vars || theme).palette.text.primary,
-        borderRadius: (theme.vars || theme).shape.borderRadius,
-        border: `1px solid ${(theme.vars || theme).palette.divider}`,
-        backgroundColor: (theme.vars || theme).palette.background.default,
-        transition: 'border 120ms ease-in',
-        '&:hover': {
-          borderColor: gray[400],
-        },
-        [`&.${outlinedInputClasses.focused}`]: {
-          outline: `3px solid ${alpha(brand[500], 0.5)}`,
-          borderColor: brand[400],
-        },
-        ...theme.applyStyles('dark', {
-          '&:hover': {
-            borderColor: gray[500],
-          },
-        }),
-        variants: [
-          {
-            props: {
-              size: 'small',
-            },
-            style: {
-              height: '2.25rem',
-            },
-          },
-          {
-            props: {
-              size: 'medium',
-            },
-            style: {
-              height: '2.5rem',
-            },
-          },
-        ],
-      }),
-      notchedOutline: {
-        border: 'none',
-      },
+      // 清除自定义样式，使用原生 Material-UI 样式
     },
   },
   MuiInputAdornment: {
@@ -436,10 +385,7 @@ export const inputsCustomizations: Components<Theme> = {
   },
   MuiFormLabel: {
     styleOverrides: {
-      root: ({ theme }) => ({
-        typography: theme.typography.caption,
-        marginBottom: 8,
-      }),
+      // 清除自定义样式，使用原生 Material-UI 样式
     },
   },
 };
