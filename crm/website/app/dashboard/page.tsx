@@ -15,6 +15,7 @@ import Paper from '@mui/material/Paper';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import StoreIcon from '@mui/icons-material/Store';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 import AppTheme from '../shared-theme/AppTheme';
 import { useAuth } from '../hooks/useAuth';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -35,6 +36,10 @@ export default function Dashboard() {
 
   const handleNavigateToInventory = () => {
     router.push('/dashboard/inventory');
+  };
+
+  const handleNavigateToSalesAnalysis = () => {
+    router.push('/dashboard/sales-analysis');
   };
 
   return (
@@ -93,10 +98,11 @@ export default function Dashboard() {
               gridTemplateColumns: {
                 xs: '1fr',
                 sm: 'repeat(2, 1fr)',
-                md: 'repeat(3, 1fr)',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(4, 1fr)',
               },
               gap: 4,
-              maxWidth: 1200,
+              maxWidth: 1400,
               mx: 'auto',
             }}
           >
@@ -272,6 +278,65 @@ export default function Dashboard() {
                     }}
                   >
                     进入商家管理
+                  </Button>
+                </CardActions>
+              </Card>
+            </Box>
+
+            {/* 销售分析与预测卡片 */}
+            <Box>
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'all 0.3s ease-in-out',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: (theme) =>
+                      `0 20px 40px ${alpha(theme.palette.info.main, 0.2)}`,
+                  },
+                }}
+              >
+                <CardContent sx={{ flexGrow: 1, textAlign: 'center', py: 4 }}>
+                  <Paper
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mx: 'auto',
+                      mb: 3,
+                      background: (theme) =>
+                        `linear-gradient(45deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
+                    }}
+                  >
+                    <AnalyticsIcon sx={{ fontSize: 40, color: 'white' }} />
+                  </Paper>
+                  <Typography variant="h5" component="h2" gutterBottom fontWeight={600}>
+                    销售分析与预测
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                    分析采购趋势、库存预警、销售预测等
+                  </Typography>
+                </CardContent>
+                <CardActions sx={{ p: 3, pt: 0 }}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    onClick={handleNavigateToSalesAnalysis}
+                    sx={{
+                      py: 1.5,
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    进入销售分析
                   </Button>
                 </CardActions>
               </Card>

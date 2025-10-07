@@ -981,3 +981,97 @@ curl -X POST http://localhost:3000/api/inventory/batch-stock-out \
 - 支持批量入库和出库
 - 提高操作效率，减少重复操作
 
+## 销售分析与预测模块 API
+
+### 1. 采购趋势分析 API
+
+#### GET /api/sales-analysis/trend
+获取指定商家的年度采购趋势分析数据。
+
+**请求参数：**
+- `merchantId` (query): 商家ID
+
+**请求示例：**
+```bash
+GET /api/sales-analysis/trend?merchantId=merchant_123
+```
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "merchant": "示例商家",
+  "trendData": [
+    {
+      "month": "1月",
+      "totalQuantity": 150,
+      "isHighVolume": false
+    },
+    {
+      "month": "2月",
+      "totalQuantity": 300,
+      "isHighVolume": true
+    }
+  ],
+  "summary": {
+    "totalQuantity": 1800,
+    "averageQuantity": 150,
+    "highVolumeMonths": 3
+  }
+}
+```
+
+### 2. 库存预警系统 API
+
+#### GET /api/sales-analysis/inventory-alert
+获取库存预警数据，包括低库存货品和采购建议。
+
+**请求示例：**
+```bash
+GET /api/sales-analysis/inventory-alert
+```
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "products": [
+    {
+      "id": "product_123",
+      "name": "示例货品",
+      "specification": "规格A",
+      "unit": "件",
+      "currentStock": 5,
+      "alertThreshold": 20,
+      "averageMonthlySales": 15,
+      "recommendedPurchase": 35,
+      "alertLevel": "low"
+    }
+  ],
+  "summary": {
+    "totalProducts": 50,
+    "lowStockProducts": 8,
+    "criticalStockProducts": 2,
+    "averageStockLevel": 45,
+    "totalRecommendedPurchase": 280
+  }
+}
+```
+
+### 3. 销售分析API特性
+
+#### 3.1 智能预警算法
+- 基于历史销售数据计算月均销量
+- 动态调整预警阈值
+- 提供个性化采购建议
+
+#### 3.2 趋势分析功能
+- 识别采购高峰期
+- 分析季节性采购规律
+- 预测未来采购需求
+
+#### 3.3 多维度统计
+- 按商家维度分析采购趋势
+- 按货品维度分析库存状况
+- 提供综合统计报告
+
