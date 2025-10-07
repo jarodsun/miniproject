@@ -11,7 +11,11 @@ import {
   TextField,
   Alert,
   CircularProgress,
-  Chip
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import { 
   ArrowBack, 
@@ -23,10 +27,14 @@ import {
   Description
 } from '@mui/icons-material';
 import Link from 'next/link';
+import { getProvinces, getCitiesByProvince, getDistrictsByCity } from '../../lib/location-data';
 
 interface FormData {
   name: string;
   phone: string;
+  province: string;
+  city: string;
+  district: string;
   region: string;
   introduction: string;
   licenseImages: File[];
@@ -36,10 +44,17 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     phone: '',
+    province: '',
+    city: '',
+    district: '',
     region: '',
     introduction: '',
     licenseImages: []
   });
+  
+  const [provinces] = useState(getProvinces());
+  const [cities, setCities] = useState<Array<{code: string, name: string}>>([]);
+  const [districts, setDistricts] = useState<Array<{code: string, name: string}>>([]);
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -48,6 +63,42 @@ export default function RegisterPage() {
     setFormData(prev => ({
       ...prev,
       [field]: event.target.value
+    }));
+  };
+
+  const handleProvinceChange = (provinceCode: string) => {
+    const newCities = getCitiesByProvince(provinceCode);
+    setCities(newCities);
+    setDistricts([]);
+    setFormData(prev => ({
+      ...prev,
+      province: provinceCode,
+      city: '',
+      district: '',
+      region: ''
+    }));
+  };
+
+  const handleCityChange = (cityCode: string) => {
+    const newDistricts = getDistrictsByCity(formData.province, cityCode);
+    setDistricts(newDistricts);
+    setFormData(prev => ({
+      ...prev,
+      city: cityCode,
+      district: '',
+      region: ''
+    }));
+  };
+
+  const handleDistrictChange = (districtCode: string) => {
+    const provinceName = provinces.find(p => p.code === formData.province)?.name || '';
+    const cityName = cities.find(c => c.code === formData.city)?.name || '';
+    const districtName = districts.find(d => d.code === districtCode)?.name || '';
+    
+    setFormData(prev => ({
+      ...prev,
+      district: districtCode,
+      region: `${provinceName} ${cityName} ${districtName}`.trim()
     }));
   };
 
@@ -127,13 +178,16 @@ export default function RegisterPage() {
       if (response.ok) {
         setMessage({ type: 'success', text: '注册成功！我们会尽快与您联系。' });
         // 清空表单
-        setFormData({
-          name: '',
-          phone: '',
-          region: '',
-          introduction: '',
-          licenseImages: []
-        });
+      setFormData({
+        name: '',
+        phone: '',
+        province: '',
+        city: '',
+        district: '',
+        region: '',
+        introduction: '',
+        licenseImages: []
+      });
       } else {
         setMessage({ type: 'error', text: result.message || '注册失败，请重试' });
       }
@@ -236,21 +290,81 @@ export default function RegisterPage() {
                 />
               </Box>
 
-              {/* 所在地区 */}
+              {/* 所在地区 - 三级联动选择 */}
               <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold' }}>
+                <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
                   所在地区 <span style={{ color: 'red' }}>*</span>
                 </Typography>
-                <TextField
-                  fullWidth
-                  placeholder="请输入您所在的省市区"
-                  value={formData.region}
-                  onChange={handleInputChange('region')}
-                  required
-                  InputProps={{
-                    startAdornment: <LocationOn sx={{ mr: 1, color: '#667eea' }} />
-                  }}
-                />
+                
+                {/* 省份选择 */}
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel>省份</InputLabel>
+                  <Select
+                    value={formData.province}
+                    onChange={(e) => handleProvinceChange(e.target.value)}
+                    label="省份"
+                    required
+                  >
+                    {provinces.map((province) => (
+                      <MenuItem key={province.code} value={province.code}>
+                        {province.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {/* 城市选择 */}
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel>城市</InputLabel>
+                  <Select
+                    value={formData.city}
+                    onChange={(e) => handleCityChange(e.target.value)}
+                    label="城市"
+                    disabled={!formData.province}
+                    required
+                  >
+                    {cities.map((city) => (
+                      <MenuItem key={city.code} value={city.code}>
+                        {city.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {/* 区县选择 */}
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel>区县</InputLabel>
+                  <Select
+                    value={formData.district}
+                    onChange={(e) => handleDistrictChange(e.target.value)}
+                    label="区县"
+                    disabled={!formData.city}
+                    required
+                  >
+                    {districts.map((district) => (
+                      <MenuItem key={district.code} value={district.code}>
+                        {district.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {/* 显示选中的完整地址 */}
+                {formData.region && (
+                  <Box sx={{ 
+                    p: 2, 
+                    backgroundColor: '#f8fafc', 
+                    borderRadius: 2,
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      已选择地区：
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      {formData.region}
+                    </Typography>
+                  </Box>
+                )}
               </Box>
 
               {/* 自我介绍 */}
