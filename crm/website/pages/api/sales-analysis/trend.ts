@@ -20,11 +20,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
 
     // 查询出库记录（采购记录）
-    const transactions = await prisma.inventoryTransaction.findMany({
+    const transactions = await prisma.transaction.findMany({
       where: {
         merchantId: merchantId as string,
-        type: 'OUT', // 出库记录表示采购
-        createdAt: {
+        type: 'OUTBOUND', // 出库记录表示采购
+        date: {
           gte: twelveMonthsAgo,
         },
       },
@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         product: true,
       },
       orderBy: {
-        createdAt: 'asc',
+        date: 'asc',
       },
     });
 
@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 汇总每个月的采购量
     transactions.forEach(transaction => {
-      const monthKey = `${transaction.createdAt.getFullYear()}-${String(transaction.createdAt.getMonth() + 1).padStart(2, '0')}`;
+      const monthKey = `${transaction.date.getFullYear()}-${String(transaction.date.getMonth() + 1).padStart(2, '0')}`;
       if (monthlyData.hasOwnProperty(monthKey)) {
         monthlyData[monthKey] += transaction.quantity;
       }

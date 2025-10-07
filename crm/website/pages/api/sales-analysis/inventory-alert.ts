@@ -20,17 +20,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    const transactions = await prisma.inventoryTransaction.findMany({
+    const transactions = await prisma.transaction.findMany({
       where: {
-        type: 'OUT',
-        createdAt: {
+        type: 'OUTBOUND',
+        date: {
           gte: sixMonthsAgo,
         },
       },
       select: {
         productId: true,
         quantity: true,
-        createdAt: true,
+        date: true,
       },
     });
 

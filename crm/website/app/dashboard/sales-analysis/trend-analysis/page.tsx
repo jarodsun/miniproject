@@ -280,6 +280,27 @@ export default function TrendAnalysis() {
                         <Typography variant="caption" color="text.secondary">
                           {item.month}
                         </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                          {(() => {
+                            // 根据月份名称计算对应的年份
+                            const currentDate = new Date();
+                            const currentMonth = currentDate.getMonth();
+                            const currentYear = currentDate.getFullYear();
+                            
+                            // 月份名称到数字的映射
+                            const monthMap: { [key: string]: number } = {
+                              '1月': 0, '2月': 1, '3月': 2, '4月': 3, '5月': 4, '6月': 5,
+                              '7月': 6, '8月': 7, '9月': 8, '10月': 9, '11月': 10, '12月': 11
+                            };
+                            
+                            const monthIndex = monthMap[item.month];
+                            if (monthIndex <= currentMonth) {
+                              return currentYear;
+                            } else {
+                              return currentYear - 1;
+                            }
+                          })()}
+                        </Typography>
                         {item.isHighVolume && (
                           <Typography variant="caption" color="error.main" fontWeight={600}>
                             高峰期
