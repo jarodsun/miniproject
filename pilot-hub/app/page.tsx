@@ -1,103 +1,319 @@
-import Image from "next/image";
+'use client';
+
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Button, 
+  Card, 
+  CardContent,
+  Grid,
+  IconButton,
+  Chip,
+  Stack
+} from '@mui/material';
+import { 
+  FlightTakeoff, 
+  Phone, 
+  Email, 
+  Chat,
+  LocationOn,
+  Security,
+  Speed,
+  Group
+} from '@mui/icons-material';
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <Box sx={{ 
+      minHeight: '100vh',
+      backgroundColor: '#f8fafc',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
+    }}>
+      {/* 第一屏：飞手注册介绍 */}
+      <Box sx={{ 
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* 背景装饰 */}
+        <Box sx={{
+          position: 'absolute',
+          top: '-50%',
+          right: '-20%',
+          width: '600px',
+          height: '600px',
+          borderRadius: '50%',
+          background: 'rgba(255,255,255,0.1)',
+          zIndex: 0
+        }} />
+        <Box sx={{
+          position: 'absolute',
+          bottom: '-30%',
+          left: '-10%',
+          width: '400px',
+          height: '400px',
+          borderRadius: '50%',
+          background: 'rgba(255,255,255,0.05)',
+          zIndex: 0
+        }} />
+        
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            {/* Logo和标题 */}
+            <Box sx={{ mb: 4 }}>
+              <FlightTakeoff sx={{ fontSize: 80, mb: 2, color: '#ffd700' }} />
+              <Typography 
+                variant="h2" 
+                component="h1" 
+                sx={{ 
+                  fontWeight: 'bold',
+                  mb: 2,
+                  fontSize: { xs: '2.5rem', md: '3.5rem' }
+                }}
+              >
+                PilotHub
+              </Typography>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  opacity: 0.9,
+                  fontSize: { xs: '1.2rem', md: '1.5rem' }
+                }}
+              >
+                专业飞手资源库
+              </Typography>
+            </Box>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            {/* 平台价值介绍 */}
+            <Box sx={{ mb: 6 }}>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  mb: 3,
+                  fontWeight: 'bold',
+                  fontSize: { xs: '1.8rem', md: '2.2rem' }
+                }}
+              >
+                为什么选择PilotHub？
+              </Typography>
+              
+              <Box sx={{ 
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+                gap: 3,
+                mb: 4
+              }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Security sx={{ fontSize: 40, mb: 1, color: '#ffd700' }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    专业认证
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    持证飞手专业认证平台
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Speed sx={{ fontSize: 40, mb: 1, color: '#ffd700' }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    快速匹配
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    精准匹配服务需求
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Group sx={{ fontSize: 40, mb: 1, color: '#ffd700' }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    资源整合
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    汇聚优质飞手资源
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <LocationOn sx={{ fontSize: 40, mb: 1, color: '#ffd700' }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    地域覆盖
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    全国范围服务网络
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 4,
+                  opacity: 0.9,
+                  lineHeight: 1.6,
+                  fontSize: { xs: '1.1rem', md: '1.3rem' }
+                }}
+              >
+                加入我们，成为专业飞手资源库的一员，获得更多商业机会和合作伙伴
+              </Typography>
+            </Box>
+
+            {/* 立即注册按钮 */}
+            <Link href="/register" passHref>
+              <Button
+                variant="contained"
+                size="large"
+                sx={{
+                  backgroundColor: '#ffd700',
+                  color: '#333',
+                  fontWeight: 'bold',
+                  fontSize: '1.2rem',
+                  px: 6,
+                  py: 2,
+                  borderRadius: '50px',
+                  boxShadow: '0 8px 32px rgba(255, 215, 0, 0.3)',
+                  '&:hover': {
+                    backgroundColor: '#ffed4e',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 40px rgba(255, 215, 0, 0.4)',
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                立即注册
+              </Button>
+            </Link>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* 第二屏：平台联系方式 */}
+      <Box sx={{ 
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+        py: 8
+      }}>
+        <Container maxWidth="md">
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Typography 
+              variant="h3" 
+              component="h2" 
+              sx={{ 
+                fontWeight: 'bold',
+                mb: 2,
+                color: '#333',
+                fontSize: { xs: '2rem', md: '2.5rem' }
+              }}
+            >
+              联系我们
+            </Typography>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: '#666',
+                mb: 4,
+                fontSize: { xs: '1.1rem', md: '1.3rem' }
+              }}
+            >
+              有任何问题或合作意向，欢迎随时联系我们
+            </Typography>
+          </Box>
+
+          <Box sx={{ 
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+            gap: 4
+          }}>
+            {/* 项目负责人 */}
+            <Card sx={{ 
+              height: '100%',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+              borderRadius: '16px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
+                  项目负责人
+                </Typography>
+                
+                <Stack spacing={3}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                    <Phone sx={{ color: '#667eea' }} />
+                    <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+                      [您的电话]
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                    <Chat sx={{ color: '#667eea' }} />
+                    <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+                      [您的微信]
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                    <Email sx={{ color: '#667eea' }} />
+                    <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+                      [您的邮箱]
+                    </Typography>
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+
+            {/* 合伙人 */}
+            <Card sx={{ 
+              height: '100%',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+              borderRadius: '16px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
+                  合伙人
+                </Typography>
+                
+                <Stack spacing={3}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                    <Phone sx={{ color: '#667eea' }} />
+                    <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+                      [合伙人电话]
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                    <Chat sx={{ color: '#667eea' }} />
+                    <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+                      [合伙人微信]
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                    <Email sx={{ color: '#667eea' }} />
+                    <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+                      [合伙人邮箱]
+                    </Typography>
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+          </Box>
+
+          {/* 底部信息 */}
+          <Box sx={{ textAlign: 'center', mt: 6 }}>
+            <Typography variant="body2" sx={{ color: '#999', mb: 2 }}>
+              PilotHub - 专业飞手资源库管理系统
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#999' }}>
+              最后更新时间：2025年10月7日
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
+    </Box>
   );
 }
