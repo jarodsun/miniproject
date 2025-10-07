@@ -120,6 +120,65 @@ export default function InventoryManagement() {
                 mx: 'auto',
               }}
             >
+              {/* 库存查询卡片 */}
+              <Box>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: (theme) =>
+                        `0 20px 40px ${alpha(theme.palette.warning.main, 0.2)}`,
+                    },
+                  }}
+                >
+                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', py: 4 }}>
+                    <Paper
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mx: 'auto',
+                        mb: 3,
+                        background: (theme) =>
+                          `linear-gradient(45deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
+                      }}
+                    >
+                      <QueryStatsIcon sx={{ fontSize: 40, color: 'white' }} />
+                    </Paper>
+                    <Typography variant="h5" component="h2" gutterBottom fontWeight={600}>
+                      库存查询
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                      查看当前库存状态和分析
+                    </Typography>
+                  </CardContent>
+                  <CardActions sx={{ p: 3, pt: 0 }}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      size="large"
+                      onClick={handleNavigateToStockQuery}
+                      sx={{
+                        py: 1.5,
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      查看库存状态
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Box>
+
               {/* 入库管理卡片 */}
               <Box>
                 <Card
@@ -292,65 +351,6 @@ export default function InventoryManagement() {
                       }}
                     >
                       查看库存流水
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Box>
-
-              {/* 库存查询卡片 */}
-              <Box>
-                <Card
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all 0.3s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: (theme) =>
-                        `0 20px 40px ${alpha(theme.palette.warning.main, 0.2)}`,
-                    },
-                  }}
-                >
-                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', py: 4 }}>
-                    <Paper
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mx: 'auto',
-                        mb: 3,
-                        background: (theme) =>
-                          `linear-gradient(45deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
-                      }}
-                    >
-                      <QueryStatsIcon sx={{ fontSize: 40, color: 'white' }} />
-                    </Paper>
-                    <Typography variant="h5" component="h2" gutterBottom fontWeight={600}>
-                      库存查询
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                      查看当前库存状态和分析
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ p: 3, pt: 0 }}>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      size="large"
-                      onClick={handleNavigateToStockQuery}
-                      sx={{
-                        py: 1.5,
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        fontSize: '1.1rem',
-                        fontWeight: 600,
-                      }}
-                    >
-                      查看库存状态
                     </Button>
                   </CardActions>
                 </Card>

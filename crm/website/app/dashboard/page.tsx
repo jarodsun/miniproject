@@ -100,6 +100,65 @@ export default function Dashboard() {
               mx: 'auto',
             }}
           >
+            {/* 出入库管理卡片 */}
+            <Box>
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'all 0.3s ease-in-out',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: (theme) =>
+                      `0 20px 40px ${alpha(theme.palette.success.main, 0.2)}`,
+                  },
+                }}
+              >
+                <CardContent sx={{ flexGrow: 1, textAlign: 'center', py: 4 }}>
+                  <Paper
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mx: 'auto',
+                      mb: 3,
+                      background: (theme) =>
+                        `linear-gradient(45deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
+                    }}
+                  >
+                    <WarehouseIcon sx={{ fontSize: 40, color: 'white' }} />
+                  </Paper>
+                  <Typography variant="h5" component="h2" gutterBottom fontWeight={600}>
+                    出入库管理
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                    管理货品入库、出库、库存流水等
+                  </Typography>
+                </CardContent>
+                <CardActions sx={{ p: 3, pt: 0 }}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    onClick={handleNavigateToInventory}
+                    sx={{
+                      py: 1.5,
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    进入出入库管理
+                  </Button>
+                </CardActions>
+              </Card>
+            </Box>
+
             {/* 货品管理卡片 */}
             <Box>
               <Card
@@ -213,65 +272,6 @@ export default function Dashboard() {
                     }}
                   >
                     进入商家管理
-                  </Button>
-                </CardActions>
-              </Card>
-            </Box>
-
-            {/* 出入库管理卡片 */}
-            <Box>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'all 0.3s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: (theme) =>
-                      `0 20px 40px ${alpha(theme.palette.success.main, 0.2)}`,
-                  },
-                }}
-              >
-                <CardContent sx={{ flexGrow: 1, textAlign: 'center', py: 4 }}>
-                  <Paper
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mx: 'auto',
-                      mb: 3,
-                      background: (theme) =>
-                        `linear-gradient(45deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
-                    }}
-                  >
-                    <WarehouseIcon sx={{ fontSize: 40, color: 'white' }} />
-                  </Paper>
-                  <Typography variant="h5" component="h2" gutterBottom fontWeight={600}>
-                    出入库管理
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                    管理货品入库、出库、库存流水等
-                  </Typography>
-                </CardContent>
-                <CardActions sx={{ p: 3, pt: 0 }}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    size="large"
-                    onClick={handleNavigateToInventory}
-                    sx={{
-                      py: 1.5,
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                    }}
-                  >
-                    进入出入库管理
                   </Button>
                 </CardActions>
               </Card>
