@@ -1,415 +1,127 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import CircularProgress from '@mui/material/CircularProgress';
-import {
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Chip,
-  Avatar,
-  InputAdornment,
-  Pagination,
-  Alert,
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Search as SearchIcon,
-  Business as BusinessIcon,
-} from '@mui/icons-material';
-import AppNavbar from '../components/AppNavbar';
-import SideMenu from '../components/SideMenu';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import AppTheme from '../../shared-theme/AppTheme';
 import { useAuth } from '../../hooks/useAuth';
-import {
-  chartsCustomizations,
-  dataGridCustomizations,
-  datePickersCustomizations,
-  treeViewCustomizations,
-} from '../theme/customizations';
+import CircularProgress from '@mui/material/CircularProgress';
+import UserInfo from '../components/UserInfo';
+import AuthGuard from '../components/AuthGuard';
+import ThemeToggle from '../components/ThemeToggle';
 
-const xThemeComponents = {
-  ...chartsCustomizations,
-  ...dataGridCustomizations,
-  ...datePickersCustomizations,
-  ...treeViewCustomizations,
-};
-
-interface Merchant {
-  id: number;
-  name: string;
-  contact: string;
-  phone: string;
-  address: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export default function MerchantsPage(props: { disableCustomTheme?: boolean }) {
+export default function MerchantsPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
-  const [merchants, setMerchants] = useState<Merchant[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [openDialog, setOpenDialog] = useState(false);
-  const [editingMerchant, setEditingMerchant] = useState<Merchant | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    contact: '',
-    phone: '',
-    address: '',
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
 
-  const fetchMerchants = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/merchants?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}`);
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          setMerchants(result.data.merchants || []);
-          setTotalPages(result.data.pagination?.pages || 1);
-        } else {
-          setError(result.message || '获取商家列表失败');
-        }
-      } else {
-        setError('获取商家列表失败');
-      }
-    } catch (err) {
-      setError('网络错误，请重试');
-    } finally {
-      setLoading(false);
-    }
+  const handleGoBack = () => {
+    router.push('/dashboard');
   };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchMerchants();
-    }
-  }, [currentPage, searchTerm, isAuthenticated]);
-
-  // 如果正在加载，显示加载状态
-  if (isLoading) {
-    return (
-      <AppTheme {...props} themeComponents={xThemeComponents}>
-        <CssBaseline enableColorScheme />
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      </AppTheme>
-    );
-  }
-
-  // 如果未认证，重定向到登录页面
-  if (!isAuthenticated) {
-    router.push('/');
-    return null;
-  }
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-    setCurrentPage(1);
-  };
-
-  const handleOpenDialog = (merchant?: Merchant) => {
-    if (merchant) {
-      setEditingMerchant(merchant);
-      setFormData({
-        name: merchant.name,
-        contact: merchant.contact,
-        phone: merchant.phone,
-        address: merchant.address,
-      });
-    } else {
-      setEditingMerchant(null);
-      setFormData({
-        name: '',
-        contact: '',
-        phone: '',
-        address: '',
-      });
-    }
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setEditingMerchant(null);
-    setFormData({
-      name: '',
-      contact: '',
-      phone: '',
-      address: '',
-    });
-  };
-
-  const handleSave = async () => {
-    try {
-      const url = editingMerchant ? `/api/merchants/${editingMerchant.id}` : '/api/merchants';
-      const method = editingMerchant ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        handleCloseDialog();
-        fetchMerchants();
-      } else {
-        setError(editingMerchant ? '更新商家失败' : '创建商家失败');
-      }
-    } catch (err) {
-      setError('网络错误，请重试');
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (window.confirm('确定要删除这个商家吗？')) {
-      try {
-        const response = await fetch(`/api/merchants/${id}`, {
-          method: 'DELETE',
-        });
-
-        if (response.ok) {
-          fetchMerchants();
-        } else {
-          setError('删除商家失败');
-        }
-      } catch (err) {
-        setError('网络错误，请重试');
-      }
-    }
-  };
-
-  const filteredMerchants = merchants.filter(merchant =>
-    merchant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    merchant.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    merchant.phone.includes(searchTerm)
-  );
 
   return (
-    <AppTheme {...props} themeComponents={xThemeComponents}>
-      <CssBaseline enableColorScheme />
-      <Box sx={{ display: 'flex' }}>
-        <SideMenu />
-        <AppNavbar />
-        {/* Main content */}
-        <Box
-          component="main"
-          sx={(theme) => ({
-            flexGrow: 1,
-            backgroundColor: theme.vars
-              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
-              : alpha(theme.palette.background.default, 1),
-            overflow: 'auto',
-          })}
-        >
-          <Stack
-            spacing={2}
-            sx={{
-              alignItems: 'center',
-              mx: 3,
-              pb: 5,
-              mt: { xs: 8, md: 0 },
-            }}
-          >
-            {/* 页面标题 */}
-            <Box sx={{ width: '100%', mt: 2 }}>
-              <Typography variant="h4" component="h1" gutterBottom>
-                商家管理
+    <AuthGuard>
+      <AppTheme>
+        <CssBaseline enableColorScheme />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            display: 'block',
+            position: 'absolute',
+            zIndex: -1,
+            inset: 0,
+            backgroundRepeat: 'no-repeat',
+            ...(theme) => theme.applyStyles('dark', {
+              backgroundImage:
+                'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
+            }),
+          },
+        }}
+      >
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+          {/* 用户信息栏 */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <ThemeToggle />
+            <UserInfo />
+          </Box>
+          
+          {/* 页面头部 */}
+          <Box sx={{ mb: 4 }}>
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={handleGoBack}
+              sx={{ mb: 2 }}
+            >
+              返回控制面板
+            </Button>
+            <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
+              商家管理
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              管理商家信息、联系方式、合作状态等
+            </Typography>
+          </Box>
+
+          {/* 操作栏 */}
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                sx={{ minWidth: 140 }}
+              >
+                添加商家
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<SearchIcon />}
+                sx={{ minWidth: 120 }}
+              >
+                搜索
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<FilterListIcon />}
+                sx={{ minWidth: 120 }}
+              >
+                筛选
+              </Button>
+            </Box>
+          </Paper>
+
+          {/* 内容区域 */}
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              商家列表
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 400,
+                color: 'text.secondary',
+              }}
+            >
+              <Typography variant="body1">
+                商家列表功能正在开发中...
               </Typography>
             </Box>
-
-            {/* 错误提示 */}
-            {error && (
-              <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-                {error}
-              </Alert>
-            )}
-
-            {/* 搜索和添加按钮 */}
-            <Card sx={{ width: '100%' }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <TextField
-                    fullWidth
-                    placeholder="搜索商家名称、联系人或电话..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => handleOpenDialog()}
-                    sx={{ 
-                      whiteSpace: 'nowrap',
-                      px: 2
-                    }}
-                  >
-                    添加商家
-                  </Button>
-                </Box>
-
-                {/* 商家列表 */}
-                {loading ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                    <CircularProgress />
-                  </Box>
-                ) : (
-                  <TableContainer component={Paper}>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>商家名称</TableCell>
-                          <TableCell>联系人</TableCell>
-                          <TableCell>联系电话</TableCell>
-                          <TableCell>地址</TableCell>
-                          <TableCell>操作</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {filteredMerchants.map((merchant) => (
-                          <TableRow key={merchant.id}>
-                            <TableCell>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Avatar sx={{ width: 32, height: 32 }}>
-                                  <BusinessIcon />
-                                </Avatar>
-                                {merchant.name}
-                              </Box>
-                            </TableCell>
-                            <TableCell>{merchant.contact}</TableCell>
-                            <TableCell>{merchant.phone}</TableCell>
-                            <TableCell>
-                              <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                {merchant.address}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleOpenDialog(merchant)}
-                              >
-                                <EditIcon />
-                              </IconButton>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleDelete(merchant.id)}
-                                color="error"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-
-                {/* 分页 */}
-                {totalPages > 1 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                    <Pagination
-                      count={totalPages}
-                      page={currentPage}
-                      onChange={(_, page) => setCurrentPage(page)}
-                      color="primary"
-                    />
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          </Stack>
-        </Box>
+          </Paper>
+        </Container>
       </Box>
-
-      {/* 创建/编辑对话框 */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {editingMerchant ? '编辑商家' : '添加商家'}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              fullWidth
-              label="商家名称"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-            <TextField
-              fullWidth
-              label="联系人"
-              value={formData.contact}
-              onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-            />
-            <TextField
-              fullWidth
-              label="联系电话"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-            <TextField
-              fullWidth
-              label="地址"
-              multiline
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>取消</Button>
-          <Button onClick={handleSave} variant="contained">
-            {editingMerchant ? '更新' : '创建'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </AppTheme>
+      </AppTheme>
+    </AuthGuard>
   );
 }
