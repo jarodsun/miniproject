@@ -16,6 +16,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import HistoryIcon from '@mui/icons-material/History';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import AppTheme from '../../shared-theme/AppTheme';
 import UserInfo from '../components/UserInfo';
 import AuthGuard from '../components/AuthGuard';
@@ -38,6 +39,10 @@ export default function InventoryManagement() {
 
   const handleNavigateToTransactions = () => {
     router.push('/dashboard/inventory/transactions');
+  };
+
+  const handleNavigateToStockQuery = () => {
+    router.push('/dashboard/inventory/stock-query');
   };
 
   return (
@@ -97,7 +102,7 @@ export default function InventoryManagement() {
                 出入库管理
               </Typography>
               <Typography variant="h6" color="text.secondary">
-                管理货品的入库、出库和库存流水
+                执行库存变动操作（入库、出库、流水记录）
               </Typography>
             </Box>
 
@@ -107,10 +112,11 @@ export default function InventoryManagement() {
                 gridTemplateColumns: {
                   xs: '1fr',
                   sm: 'repeat(2, 1fr)',
-                  md: 'repeat(3, 1fr)',
+                  md: 'repeat(2, 1fr)',
+                  lg: 'repeat(4, 1fr)',
                 },
                 gap: 4,
-                maxWidth: 1200,
+                maxWidth: 1400,
                 mx: 'auto',
               }}
             >
@@ -286,6 +292,65 @@ export default function InventoryManagement() {
                       }}
                     >
                       查看库存流水
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Box>
+
+              {/* 库存查询卡片 */}
+              <Box>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: (theme) =>
+                        `0 20px 40px ${alpha(theme.palette.warning.main, 0.2)}`,
+                    },
+                  }}
+                >
+                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', py: 4 }}>
+                    <Paper
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mx: 'auto',
+                        mb: 3,
+                        background: (theme) =>
+                          `linear-gradient(45deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
+                      }}
+                    >
+                      <QueryStatsIcon sx={{ fontSize: 40, color: 'white' }} />
+                    </Paper>
+                    <Typography variant="h5" component="h2" gutterBottom fontWeight={600}>
+                      库存查询
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                      查看当前库存状态和分析
+                    </Typography>
+                  </CardContent>
+                  <CardActions sx={{ p: 3, pt: 0 }}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      size="large"
+                      onClick={handleNavigateToStockQuery}
+                      sx={{
+                        py: 1.5,
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      查看库存状态
                     </Button>
                   </CardActions>
                 </Card>
