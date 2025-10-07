@@ -33,7 +33,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Chip,
   Avatar,
   InputAdornment,
   Pagination,
@@ -70,7 +69,6 @@ export default function ProductsPage() {
     specification: '',
     unit: '',
     currentStock: 0,
-    imageUrl: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -130,7 +128,6 @@ export default function ProductsPage() {
         specification: product.specification,
         unit: product.unit,
         currentStock: product.currentStock,
-        imageUrl: product.imageUrl || '',
       });
     } else {
       setEditingProduct(null);
@@ -139,7 +136,6 @@ export default function ProductsPage() {
         specification: '',
         unit: '',
         currentStock: 0,
-        imageUrl: '',
       });
     }
     setOpenDialog(true);
@@ -153,7 +149,6 @@ export default function ProductsPage() {
       specification: '',
       unit: '',
       currentStock: 0,
-      imageUrl: '',
     });
   };
 
@@ -199,11 +194,6 @@ export default function ProductsPage() {
     }
   };
 
-  const getStockStatus = (stock: number) => {
-    if (stock === 0) return { label: '缺货', color: 'error' as const };
-    if (stock < 10) return { label: '库存不足', color: 'warning' as const };
-    return { label: '库存充足', color: 'success' as const };
-  };
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -306,58 +296,40 @@ export default function ProductsPage() {
                       <TableCell>规格</TableCell>
                       <TableCell>单位</TableCell>
                       <TableCell>当前库存</TableCell>
-                      <TableCell>库存状态</TableCell>
                       <TableCell>操作</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {filteredProducts.map((product) => {
-                      const stockStatus = getStockStatus(product.currentStock);
-                      return (
-                        <TableRow key={product.id}>
-                          <TableCell>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              {product.imageUrl ? (
-                                <Avatar
-                                  src={product.imageUrl}
-                                  sx={{ width: 32, height: 32 }}
-                                />
-                              ) : (
-                                <Avatar sx={{ width: 32, height: 32 }}>
-                                  <InventoryIcon />
-                                </Avatar>
-                              )}
-                              {product.name}
-                            </Box>
-                          </TableCell>
-                          <TableCell>{product.specification}</TableCell>
-                          <TableCell>{product.unit}</TableCell>
-                          <TableCell>{product.currentStock}</TableCell>
-                          <TableCell>
-                            <Chip
-                              label={stockStatus.label}
-                              color={stockStatus.color}
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleOpenDialog(product)}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDelete(product.id)}
-                              color="error"
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                    {filteredProducts.map((product) => (
+                      <TableRow key={product.id}>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Avatar sx={{ width: 32, height: 32 }}>
+                              <InventoryIcon />
+                            </Avatar>
+                            {product.name}
+                          </Box>
+                        </TableCell>
+                        <TableCell>{product.specification}</TableCell>
+                        <TableCell>{product.unit}</TableCell>
+                        <TableCell>{product.currentStock}</TableCell>
+                        <TableCell>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleOpenDialog(product)}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDelete(product.id)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -413,12 +385,6 @@ export default function ProductsPage() {
                 onChange={(e) => setFormData({ ...formData, currentStock: Number(e.target.value) })}
               />
             </Box>
-            <TextField
-              fullWidth
-              label="图片URL"
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-            />
           </Box>
         </DialogContent>
         <DialogActions>
