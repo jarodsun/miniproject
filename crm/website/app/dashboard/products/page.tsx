@@ -304,7 +304,10 @@ export default function ProductsPage(props: { disableCustomTheme?: boolean }) {
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={() => handleOpenDialog()}
-                    sx={{ minWidth: 120 }}
+                    sx={{ 
+                      whiteSpace: 'nowrap',
+                      px: 2
+                    }}
                   >
                     添加货品
                   </Button>

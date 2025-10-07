@@ -285,7 +285,10 @@ export default function MerchantsPage(props: { disableCustomTheme?: boolean }) {
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={() => handleOpenDialog()}
-                    sx={{ minWidth: 120 }}
+                    sx={{ 
+                      whiteSpace: 'nowrap',
+                      px: 2
+                    }}
                   >
                     添加商家
                   </Button>
