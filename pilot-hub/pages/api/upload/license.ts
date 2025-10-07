@@ -9,7 +9,7 @@ interface NextApiRequestWithFiles extends NextApiRequest {
 }
 
 // 确保上传目录存在
-const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'licenses')
+const uploadDir = path.join(process.cwd(), 'uploads', 'licenses')
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true })
 }
