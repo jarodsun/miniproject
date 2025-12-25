@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <!-- 
+    Dynamic header from main site: https://www.idcsmart.com/
+    This city showcase feature is an additional functionality provided for the main site.
+    
+    Implementation options:
+    1. Server-side include (Recommended): Fetch header HTML during page generation
+    2. Client-side fetch: Use JavaScript to load header via server proxy
+    -->
+    
+    <!-- Option 2: Client-side JavaScript (Fallback if server-side not available) -->
+    <!-- This requires a server-side proxy endpoint to avoid CORS issues -->
+    <script>
+        (function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                var headerContainer = document.getElementById('main-site-header-container');
+                if (headerContainer && (!headerContainer.innerHTML.trim() || headerContainer.innerHTML === '{main_site_header}')) {
+                    // Use a server-side proxy endpoint to fetch header
+                    // Example endpoint: /api/proxy-header or /proxy/header
+                    // The proxy should fetch https://www.idcsmart.com/ and extract #header element
+                    fetch('/api/proxy-header')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Proxy request failed');
+                            return response.text();
+                        })
+                        .then(html => {
+                            var parser = new DOMParser();
+                            var doc = parser.parseFromString(html, 'text/html');
+                            var header = doc.querySelector('#header');
+                            if (header) {
+                                headerContainer.innerHTML = header.outerHTML;
+                                // Also try to load header-related CSS if needed
+                                var headerStyles = doc.querySelectorAll('head link[rel="stylesheet"]');
+                                headerStyles.forEach(function(link) {
+                                    var existingLink = document.querySelector('head link[href="' + link.href + '"]');
+                                    if (!existingLink && link.href) {
+                                        var newLink = document.createElement('link');
+                                        newLink.rel = 'stylesheet';
+                                        newLink.href = link.href;
+                                        document.head.appendChild(newLink);
+                                    }
+                                });
+                            }
+                        })
+                        .catch(function(error) {
+                            console.warn('Failed to load header from main site via proxy:', error);
+                            // Could show a fallback message or leave empty
+                        });
+                }
+            });
+        })();
+    </script>
+</head>
+<body>
+<!-- Option 1: Server-side include (Recommended for production) -->
+<!-- The header content should be fetched from https://www.idcsmart.com/ and inserted here during HTML generation -->
+<!-- Placeholder variable: {main_site_header} -->
+<div id="main-site-header-container">
+    {main_site_header}
+</div>
