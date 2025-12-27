@@ -18,8 +18,8 @@ from common import (
 )
 
 
-DATA_FILE = BASE_DIR / "pcas.json"
-HK_MO_TW_FILE = BASE_DIR / "HK-MO-TW.json"
+DATA_FILE = BASE_DIR / "data" / "pcas.json"
+HK_MO_TW_FILE = BASE_DIR / "data" / "HK-MO-TW.json"
 
 # 地区分类定义
 REGIONS = {

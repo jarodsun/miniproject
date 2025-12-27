@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-处理普通省份和直辖市的脚本
+处理普通省份的脚本
 
 功能：
 1. 读取 pcas.json 数据
 2. 处理普通省份（省->市->区->街道）
-3. 处理四个直辖市（市->区->街道）
 """
 
 import json
@@ -46,37 +45,6 @@ def generate_province_html(province_name: str, cities: List[Tuple[str, str]]) ->
         <h2>下辖城市：</h2>
         <ul>
 {city_list_html}
-        </ul>
-    </div>
-</body>
-</html>"""
-    return html
-
-
-def generate_municipality_html(municipality_name: str, districts: List[Tuple[str, str]]) -> str:
-    """
-    生成直辖市级别 HTML
-    municipality_name: 直辖市名称
-    districts: [(区名称, 区拼音), ...]
-    """
-    district_list_html = "\n".join([
-        f'        <li><a href="{district_pinyin}/index.html">{district_name}</a></li>'
-        for district_name, district_pinyin in districts
-    ])
-    
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{municipality_name} - 行政区划</title>
-</head>
-<body>
-    <div class="municipality">
-        <h1>{municipality_name}</h1>
-        <h2>下辖区县：</h2>
-        <ul>
-{district_list_html}
         </ul>
     </div>
 </body>
@@ -127,16 +95,14 @@ def generate_district_html(
     district_name: str,
     city_name: str,
     province_name: str,
-    is_municipality: bool,
     streets: List[Tuple[str, str]],
     back_path: str = "../"
 ) -> str:
     """
-    生成区级别 HTML
+    生成区级别 HTML（普通省份专用）
     district_name: 区名称
     city_name: 城市名称
     province_name: 省份名称
-    is_municipality: 是否为直辖市
     streets: [(街道名称, 街道拼音), ...]
     back_path: 返回上级的路径（用于生成相对链接）
     """
@@ -145,10 +111,9 @@ def generate_district_html(
         for street_name, street_pinyin in streets
     ])
     
-    # 生成导航链接
+    # 生成导航链接（普通省份有城市和省份链接）
     nav_html = f'        <p>所属城市：<a href="{back_path}index.html">{city_name}</a></p>'
-    if not is_municipality:
-        nav_html += f'\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
+    nav_html += f'\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
     
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -176,22 +141,19 @@ def generate_street_html(
     district_name: str,
     city_name: str,
     province_name: str,
-    is_municipality: bool,
     back_path: str = "../"
 ) -> str:
     """
-    生成街道级别 HTML
+    生成街道级别 HTML（普通省份专用）
     street_name: 街道名称
     district_name: 区名称
     city_name: 城市名称
     province_name: 省份名称
-    is_municipality: 是否为直辖市
     back_path: 返回上级的路径（用于生成相对链接）
     """
     nav_html = f'        <p>所属区县：<a href="{back_path}index.html">{district_name}</a></p>'
     nav_html += f'\n        <p>所属城市：<a href="{back_path}../index.html">{city_name}</a></p>'
-    if not is_municipality:
-        nav_html += f'\n        <p>所属省份：<a href="{back_path}../../index.html">{province_name}</a></p>'
+    nav_html += f'\n        <p>所属省份：<a href="{back_path}../../index.html">{province_name}</a></p>'
     
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -208,70 +170,6 @@ def generate_street_html(
 </body>
 </html>"""
     return html
-
-
-def process_municipality(province_name: str, province_data: Dict[str, Any]):
-    """
-    处理直辖市
-    """
-    province_pinyin = to_pinyin(province_name)
-    province_dir = OUTPUT_DIR / province_pinyin
-    
-    # 跳过"市辖区"层，直接获取区县数据
-    shixiaqu_data = province_data.get("市辖区", {})
-    if not shixiaqu_data:
-        print(f"警告: {province_name} 没有找到市辖区数据")
-        return
-    
-    # 收集所有区县信息
-    districts = []
-    for district_name, streets_list in shixiaqu_data.items():
-        district_pinyin = to_pinyin(district_name)
-        districts.append((district_name, district_pinyin))
-    
-    # 生成直辖市级别 HTML
-    municipality_html = generate_municipality_html(province_name, districts)
-    write_html_file(province_dir / "index.html", municipality_html)
-    print(f"已生成: {province_name} 首页")
-    
-    # 处理每个区县
-    for district_name, district_pinyin in districts:
-        district_dir = province_dir / district_pinyin
-        streets_list = shixiaqu_data[district_name]
-        
-        # 收集街道信息
-        streets = []
-        for street_name in streets_list:
-            street_pinyin = to_pinyin(street_name)
-            streets.append((street_name, street_pinyin))
-        
-        # 生成区级别 HTML
-        district_html = generate_district_html(
-            district_name,
-            province_name,  # 直辖市时，城市名称等于省份名称
-            province_name,
-            True,  # is_municipality
-            streets,
-            "../"  # back_path
-        )
-        write_html_file(district_dir / "index.html", district_html)
-        print(f"  已生成: {district_name} 首页")
-        
-        # 处理每个街道
-        for street_name, street_pinyin in streets:
-            street_dir = district_dir / street_pinyin
-            
-            # 生成街道级别 HTML
-            street_html = generate_street_html(
-                street_name,
-                district_name,
-                province_name,  # 直辖市时，城市名称等于省份名称
-                province_name,
-                True,  # is_municipality
-                "../"  # back_path
-            )
-            write_html_file(street_dir / "index.html", street_html)
-            print(f"    已生成: {street_name} 首页")
 
 
 def process_province(province_name: str, province_data: Dict[str, Any]):
@@ -329,7 +227,6 @@ def process_province(province_name: str, province_data: Dict[str, Any]):
                 district_name,
                 city_name,
                 province_name,
-                False,  # is_municipality
                 streets,
                 "../"  # back_path
             )
@@ -346,7 +243,6 @@ def process_province(province_name: str, province_data: Dict[str, Any]):
                     district_name,
                     city_name,
                     province_name,
-                    False,  # is_municipality
                     "../"  # back_path
                 )
                 write_html_file(street_dir / "index.html", street_html)
@@ -374,23 +270,28 @@ def main():
         print(f"错误: 无法读取数据文件: {e}")
         return
     
-    # 处理每个省份/直辖市
-    print("\n开始生成 HTML 文件...")
-    total_provinces = len(data)
+    # 筛选出普通省份数据（排除直辖市）
+    province_data = {
+        name: data[name] 
+        for name in data.keys() 
+        if name not in MUNICIPALITIES
+    }
+    
+    if not province_data:
+        print("警告: 没有找到普通省份数据")
+        return
+    
+    # 处理每个省份
+    print("\n开始生成普通省份 HTML 文件...")
+    total_provinces = len(province_data)
     current = 0
     
-    for province_name, province_data in data.items():
+    for province_name, province_info in province_data.items():
         current += 1
         print(f"\n[{current}/{total_provinces}] 处理: {province_name}")
-        
-        if province_name in MUNICIPALITIES:
-            # 处理直辖市
-            process_municipality(province_name, province_data)
-        else:
-            # 处理普通省份
-            process_province(province_name, province_data)
+        process_province(province_name, province_info)
     
-    print(f"\n完成! 所有 HTML 文件已生成到: {OUTPUT_DIR}")
+    print(f"\n完成! 所有普通省份 HTML 文件已生成到: {OUTPUT_DIR}")
 
 
 if __name__ == "__main__":

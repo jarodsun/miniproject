@@ -19,7 +19,7 @@ from common import (
 )
 
 
-HK_MO_TW_FILE = BASE_DIR / "HK-MO-TW.json"
+HK_MO_TW_FILE = BASE_DIR / "data" / "HK-MO-TW.json"
 
 
 def generate_municipality_html(municipality_name: str, districts: List[Tuple[str, str]]) -> str:

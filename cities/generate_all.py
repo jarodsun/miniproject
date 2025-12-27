@@ -6,8 +6,9 @@
 功能：
 统一调用所有生成脚本，按顺序执行：
 1. 生成根目录首页
-2. 生成普通省份和直辖市
-3. 生成港澳台
+2. 生成直辖市
+3. 生成普通省份
+4. 生成港澳台
 
 这样只需要运行一个脚本就可以完成所有工作。
 """
@@ -22,7 +23,8 @@ BASE_DIR = Path(__file__).parent
 # 脚本列表（按执行顺序）
 SCRIPTS = [
     "generate_root_index.py",
-    "generate_mainland.py",
+    "generate_municipalities.py",
+    "generate_provinces.py",
     "generate_hk_mo_tw.py",
 ]
 

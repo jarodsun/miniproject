@@ -23,8 +23,8 @@ except ImportError:
 
 # 配置
 BASE_DIR = Path(__file__).parent
-DATA_FILE = BASE_DIR / "pcas.json"
-HK_MO_TW_FILE = BASE_DIR / "HK-MO-TW.json"
+DATA_FILE = BASE_DIR / "data" / "pcas.json"
+HK_MO_TW_FILE = BASE_DIR / "data" / "HK-MO-TW.json"
 OUTPUT_DIR = BASE_DIR / "output"
 
 # 四个直辖市
