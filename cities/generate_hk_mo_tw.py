@@ -17,6 +17,7 @@ from common import (
     BASE_DIR, OUTPUT_DIR, HONG_KONG, MACAO, TAIWAN,
     to_pinyin, write_html_file
 )
+from html_renderer import get_renderer
 
 
 HK_MO_TW_FILE = BASE_DIR / "data" / "HK-MO-TW.json"
@@ -28,28 +29,60 @@ def generate_municipality_html(municipality_name: str, districts: List[Tuple[str
     municipality_name: 特别行政区名称
     districts: [(区域名称, 区域拼音), ...]
     """
+    # 生成下级列表 HTML
     district_list_html = "\n".join([
         f'        <li><a href="{district_pinyin}/index.html">{district_name}</a></li>'
         for district_name, district_pinyin in districts
     ])
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{municipality_name} - 行政区划</title>
-</head>
-<body>
-    <div class="municipality">
-        <h1>{municipality_name}</h1>
-        <h2>下辖区域：</h2>
-        <ul>
-{district_list_html}
-        </ul>
-    </div>
-</body>
-</html>"""
+    # 生成城市导航列表（用于复杂模板）
+    city_nav_list_html = " | ".join([
+        f'<a href="{district_pinyin}/index.html">{district_name}</a>'
+        for district_name, district_pinyin in districts
+    ])
+    
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{municipality_name} - 行政区划",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "直辖市名称": municipality_name,
+        "下级列表": district_list_html,
+        "城市导航列表": city_nav_list_html,
+        "banner": "",
+        # 产品区块变量（如果需要，可以后续添加）
+        "产品名称1": "",
+        "地区信息1": "",
+        "规格1": "",
+        "带宽1": "",
+        "独享IP1": "",
+        "优惠价1": "",
+        "原价1": "",
+        "购买链接1": "",
+        "产品名称2": "",
+        "地区信息2": "",
+        "规格2": "",
+        "带宽2": "",
+        "独享IP2": "",
+        "优惠价2": "",
+        "原价2": "",
+        "购买链接2": "",
+        "产品名称3": "",
+        "地区信息3": "",
+        "规格3": "",
+        "带宽3": "",
+        "独享IP3": "",
+        "优惠价3": "",
+        "原价3": "",
+        "购买链接3": "",
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_municipality_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 
@@ -60,29 +93,31 @@ def generate_region_html(region_name: str, province_name: str, districts: List[T
     province_name: 特别行政区名称
     districts: [(区名称, 区拼音), ...]
     """
+    # 生成下级列表 HTML
     district_list_html = "\n".join([
         f'        <li><a href="{district_pinyin}/index.html">{district_name}</a></li>'
         for district_name, district_pinyin in districts
     ])
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{region_name} - {province_name}</title>
-</head>
-<body>
-    <div class="region">
-        <h1>{region_name}</h1>
-        <p>所属特别行政区：<a href="../index.html">{province_name}</a></p>
-        <h2>下辖区：</h2>
-        <ul>
-{district_list_html}
-        </ul>
-    </div>
-</body>
-</html>"""
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{region_name} - {province_name}",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "区县名称": region_name,
+        "城市名称": region_name,
+        "省份名称": province_name,
+        "城市链接": "../index.html",
+        "省份链接": f'        <p>所属特别行政区：<a href="../index.html">{province_name}</a></p>',
+        "下级列表": district_list_html,
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_district_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 
@@ -107,24 +142,29 @@ def generate_district_only_html(
         nav_label = "所属城市"
     
     if province_name in [HONG_KONG, MACAO]:
-        nav_text = f'        <p>{nav_label}：<a href="{back_path}index.html">{region_name}</a></p>\n        <p>所属特别行政区：<a href="{back_path}../index.html">{province_name}</a></p>'
+        province_link_html = f'        <p>{nav_label}：<a href="{back_path}index.html">{region_name}</a></p>\n        <p>所属特别行政区：<a href="{back_path}../index.html">{province_name}</a></p>'
     else:
-        nav_text = f'        <p>{nav_label}：<a href="{back_path}index.html">{region_name}</a></p>\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
+        province_link_html = f'        <p>{nav_label}：<a href="{back_path}index.html">{region_name}</a></p>\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{district_name} - {region_name} - {province_name}</title>
-</head>
-<body>
-    <div class="district">
-        <h1>{district_name}</h1>
-{nav_text}
-    </div>
-</body>
-</html>"""
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{district_name} - {region_name} - {province_name}",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "区县名称": district_name,
+        "城市名称": region_name,
+        "省份名称": province_name,
+        "城市链接": f"{back_path}index.html",
+        "省份链接": province_link_html,
+        "下级列表": "",  # 没有街道层级
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_district_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 
@@ -134,28 +174,27 @@ def generate_province_html(province_name: str, cities: List[Tuple[str, str]]) ->
     province_name: 省份名称
     cities: [(城市名称, 城市拼音), ...]
     """
+    # 生成下级列表 HTML
     city_list_html = "\n".join([
         f'        <li><a href="{city_pinyin}/index.html">{city_name}</a></li>'
         for city_name, city_pinyin in cities
     ])
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{province_name} - 行政区划</title>
-</head>
-<body>
-    <div class="province">
-        <h1>{province_name}</h1>
-        <h2>下辖城市/县：</h2>
-        <ul>
-{city_list_html}
-        </ul>
-    </div>
-</body>
-</html>"""
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{province_name} - 行政区划",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "省份名称": province_name,
+        "下级列表": city_list_html,
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_province_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 
@@ -170,29 +209,29 @@ def generate_taiwan_city_html(
     province_name: 省份名称（台湾省）
     districts: [(区名称, 区拼音), ...]
     """
+    # 生成下级列表 HTML
     district_list_html = "\n".join([
         f'        <li><a href="{district_pinyin}/index.html">{district_name}</a></li>'
         for district_name, district_pinyin in districts
     ])
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{city_name} - {province_name}</title>
-</head>
-<body>
-    <div class="city">
-        <h1>{city_name}</h1>
-        <p>所属省份：<a href="../index.html">{province_name}</a></p>
-        <h2>下辖区：</h2>
-        <ul>
-{district_list_html}
-        </ul>
-    </div>
-</body>
-</html>"""
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{city_name} - {province_name}",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "城市名称": city_name,
+        "省份名称": province_name,
+        "省份链接": "../index.html",
+        "下级列表": district_list_html,
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_city_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 

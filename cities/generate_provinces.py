@@ -16,6 +16,7 @@ from common import (
     BASE_DIR, OUTPUT_DIR, MUNICIPALITIES,
     to_pinyin, write_html_file
 )
+from html_renderer import get_renderer
 
 
 DATA_FILE = BASE_DIR / "data" / "pcas.json"
@@ -27,28 +28,27 @@ def generate_province_html(province_name: str, cities: List[Tuple[str, str]]) ->
     province_name: 省份名称
     cities: [(城市名称, 城市拼音), ...]
     """
+    # 生成下级列表 HTML
     city_list_html = "\n".join([
         f'        <li><a href="{city_pinyin}/index.html">{city_name}</a></li>'
         for city_name, city_pinyin in cities
     ])
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{province_name} - 行政区划</title>
-</head>
-<body>
-    <div class="province">
-        <h1>{province_name}</h1>
-        <h2>下辖城市：</h2>
-        <ul>
-{city_list_html}
-        </ul>
-    </div>
-</body>
-</html>"""
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{province_name} - 行政区划",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "省份名称": province_name,
+        "下级列表": city_list_html,
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_province_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 
@@ -65,29 +65,29 @@ def generate_city_html(
     province_pinyin: 省份拼音
     districts: [(区名称, 区拼音), ...]
     """
+    # 生成下级列表 HTML
     district_list_html = "\n".join([
         f'        <li><a href="{district_pinyin}/index.html">{district_name}</a></li>'
         for district_name, district_pinyin in districts
     ])
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{city_name} - {province_name}</title>
-</head>
-<body>
-    <div class="city">
-        <h1>{city_name}</h1>
-        <p>所属省份：<a href="../index.html">{province_name}</a></p>
-        <h2>下辖区县：</h2>
-        <ul>
-{district_list_html}
-        </ul>
-    </div>
-</body>
-</html>"""
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{city_name} - {province_name}",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "城市名称": city_name,
+        "省份名称": province_name,
+        "省份链接": "../index.html",
+        "下级列表": district_list_html,
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_city_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 
@@ -106,33 +106,34 @@ def generate_district_html(
     streets: [(街道名称, 街道拼音), ...]
     back_path: 返回上级的路径（用于生成相对链接）
     """
+    # 生成下级列表 HTML
     street_list_html = "\n".join([
         f'        <li><a href="{street_pinyin}/index.html">{street_name}</a></li>'
         for street_name, street_pinyin in streets
     ])
     
-    # 生成导航链接（普通省份有城市和省份链接）
-    nav_html = f'        <p>所属城市：<a href="{back_path}index.html">{city_name}</a></p>'
-    nav_html += f'\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
+    # 生成省份链接 HTML（普通省份有城市和省份链接）
+    province_link_html = f'        <p>所属城市：<a href="{back_path}index.html">{city_name}</a></p>\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{district_name} - {city_name}</title>
-</head>
-<body>
-    <div class="district">
-        <h1>{district_name}</h1>
-{nav_html}
-        <h2>下辖街道：</h2>
-        <ul>
-{street_list_html}
-        </ul>
-    </div>
-</body>
-</html>"""
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{district_name} - {city_name}",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "区县名称": district_name,
+        "城市名称": city_name,
+        "省份名称": province_name,
+        "城市链接": f"{back_path}index.html",
+        "省份链接": province_link_html,
+        "下级列表": street_list_html,
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_district_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 
@@ -151,24 +152,26 @@ def generate_street_html(
     province_name: 省份名称
     back_path: 返回上级的路径（用于生成相对链接）
     """
-    nav_html = f'        <p>所属区县：<a href="{back_path}index.html">{district_name}</a></p>'
-    nav_html += f'\n        <p>所属城市：<a href="{back_path}../index.html">{city_name}</a></p>'
-    nav_html += f'\n        <p>所属省份：<a href="{back_path}../../index.html">{province_name}</a></p>'
+    renderer = get_renderer()
+    context = {
+        "页面标题": f"{street_name} - {district_name} - {city_name}",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "街道名称": street_name,
+        "区县名称": district_name,
+        "城市名称": city_name,
+        "省份名称": province_name,
+        "区县链接": f"{back_path}index.html",
+        "城市链接": f"{back_path}../index.html",
+        "省份链接": f"{back_path}../../index.html",
+    }
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{street_name} - {district_name} - {city_name}</title>
-</head>
-<body>
-    <div class="street">
-        <h1>{street_name}</h1>
-{nav_html}
-    </div>
-</body>
-</html>"""
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_street_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 

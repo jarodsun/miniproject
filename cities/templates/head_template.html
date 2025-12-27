@@ -29,13 +29,13 @@
   <script src="./js/index.js"></script>
   <link rel="stylesheet" href="./css/index.css">
   <link rel="stylesheet" href="./common/resize.css">
-  <link rel="alternate" hreflang="zh-Hans" href="变量-当前页面URL地址">
-  <link rel="canonical" href="变量-当前页面URL地址">
+  <link rel="alternate" hreflang="zh-Hans" href="{{ 当前页面URL地址 | default('') }}">
+  <link rel="canonical" href="{{ 当前页面URL地址 | default('') }}">
   <script type="application/ld+json">
 
   </script>
 
-  <title>智简魔方idc运维管理系统-全智能IDC机房云服务器管理软件,主机管理系统,DCIM软件定制开发,运维管理软件服务商</title>
+  <title>{{ 页面标题 | default('智简魔方idc运维管理系统-全智能IDC机房云服务器管理软件,主机管理系统,DCIM软件定制开发,运维管理软件服务商') }}</title>
 </head>
 <body>
   <header id="header">

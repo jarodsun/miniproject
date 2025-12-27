@@ -16,6 +16,7 @@ from common import (
     BASE_DIR, OUTPUT_DIR,
     to_pinyin, write_html_file
 )
+from html_renderer import get_renderer
 
 
 DATA_FILE = BASE_DIR / "data" / "pcas.json"
@@ -115,20 +116,20 @@ def generate_root_html(classified_provinces: dict) -> str:
     
     sections_content = "\n".join(sections_html)
     
-    html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>中国行政区划 - 总入口</title>
-</head>
-<body>
-    <div class="root">
-        <h1>中国行政区划</h1>
-{sections_content}
-    </div>
-</body>
-</html>"""
+    renderer = get_renderer()
+    context = {
+        "页面标题": "中国行政区划 - 总入口",
+        "当前页面URL地址": "",
+        "main_site_footer": "",
+        "地区分类内容": sections_content,
+    }
+    
+    html = renderer.render_html(
+        head_template="head_template.html",
+        body_template="body_root_template.html",
+        foot_template="foot_template.html",
+        context=context
+    )
     return html
 
 

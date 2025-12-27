@@ -3,7 +3,7 @@
     <ul>
         <li><a href="../index.html">首页</a></li>
         <li>></li>
-        <li>{直辖市名称}</li>
+        <li>{{ 直辖市名称 }}</li>
     </ul>
 </div>
 
@@ -13,7 +13,7 @@
     <div class="left-column">
         <!-- Banner 轮播区域 -->
         <div class="banner-section">
-            {banner}
+            {{ banner | safe }}
         </div>
 
         <!-- 云服务器产品购买区块 -->
@@ -27,67 +27,67 @@
                 <!-- 产品区块1 -->
                 <li class="product-item">
                     <div class="product-name">
-                        <p>{产品名称1}</p>
-                        <p>{地区信息1}</p>
+                        <p>{{ 产品名称1 }}</p>
+                        <p>{{ 地区信息1 }}</p>
                     </div>
                     <div class="product-spec">
-                        <p><span>规格</span>{规格1}</p>
-                        <p><span>带宽</span>{带宽1}</p>
-                        <p><span>独享IP</span>{独享IP1}</p>
+                        <p><span>规格</span>{{ 规格1 }}</p>
+                        <p><span>带宽</span>{{ 带宽1 }}</p>
+                        <p><span>独享IP</span>{{ 独享IP1 }}</p>
                     </div>
                     <div class="product-price">
                         <p>
                             <span>优惠价</span>
-                            <strong>{优惠价1}</strong>
+                            <strong>{{ 优惠价1 }}</strong>
                             <span>元/首月</span>
                         </p>
-                        <p>原价：{原价1}元/月</p>
+                        <p>原价：{{ 原价1 }}元/月</p>
                     </div>
-                    <a href="{购买链接1}" class="buy-btn">立即购买</a>
+                    <a href="{{ 购买链接1 }}" class="buy-btn">立即购买</a>
                 </li>
                 
                 <!-- 产品区块2 -->
                 <li class="product-item">
                     <div class="product-name">
-                        <p>{产品名称2}</p>
-                        <p>{地区信息2}</p>
+                        <p>{{ 产品名称2 }}</p>
+                        <p>{{ 地区信息2 }}</p>
                     </div>
                     <div class="product-spec">
-                        <p><span>规格</span>{规格2}</p>
-                        <p><span>带宽</span>{带宽2}</p>
-                        <p><span>独享IP</span>{独享IP2}</p>
+                        <p><span>规格</span>{{ 规格2 }}</p>
+                        <p><span>带宽</span>{{ 带宽2 }}</p>
+                        <p><span>独享IP</span>{{ 独享IP2 }}</p>
                     </div>
                     <div class="product-price">
                         <p>
                             <span>优惠价</span>
-                            <strong>{优惠价2}</strong>
+                            <strong>{{ 优惠价2 }}</strong>
                             <span>元/首月</span>
                         </p>
-                        <p>原价：{原价2}元/月</p>
+                        <p>原价：{{ 原价2 }}元/月</p>
                     </div>
-                    <a href="{购买链接2}" class="buy-btn">立即购买</a>
+                    <a href="{{ 购买链接2 }}" class="buy-btn">立即购买</a>
                 </li>
                 
                 <!-- 产品区块3 -->
                 <li class="product-item">
                     <div class="product-name">
-                        <p>{产品名称3}</p>
-                        <p>{地区信息3}</p>
+                        <p>{{ 产品名称3 }}</p>
+                        <p>{{ 地区信息3 }}</p>
                     </div>
                     <div class="product-spec">
-                        <p><span>规格</span>{规格3}</p>
-                        <p><span>带宽</span>{带宽3}</p>
-                        <p><span>独享IP</span>{独享IP3}</p>
+                        <p><span>规格</span>{{ 规格3 }}</p>
+                        <p><span>带宽</span>{{ 带宽3 }}</p>
+                        <p><span>独享IP</span>{{ 独享IP3 }}</p>
                     </div>
                     <div class="product-price">
                         <p>
                             <span>优惠价</span>
-                            <strong>{优惠价3}</strong>
+                            <strong>{{ 优惠价3 }}</strong>
                             <span>元/首月</span>
                         </p>
-                        <p>原价：{原价3}元/月</p>
+                        <p>原价：{{ 原价3 }}元/月</p>
                     </div>
-                    <a href="{购买链接3}" class="buy-btn">立即购买</a>
+                    <a href="{{ 购买链接3 }}" class="buy-btn">立即购买</a>
                 </li>
             </ul>
         </div>
@@ -97,9 +97,9 @@
     <div class="right-column">
         <!-- 城市导航列表 -->
         <div class="city-nav-section">
-            <h3>{直辖市名称}：</h3>
+            <h3>{{ 直辖市名称 }}：</h3>
             <div class="city-nav-list">
-                {城市导航列表}
+                {{ 城市导航列表 | safe }}
             </div>
         </div>
     </div>
