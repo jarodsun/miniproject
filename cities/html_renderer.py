@@ -17,7 +17,7 @@ except ImportError:
     print("错误: jinja2 未安装，请运行: pip install jinja2")
     exit(1)
 
-from config import TEMPLATE_DIR, DEFAULT_TITLE, DEFAULT_KEYWORDS, DEFAULT_DESCRIPTION
+from config import TEMPLATE_DIR, DEFAULT_TITLE, DEFAULT_KEYWORDS, DEFAULT_DESCRIPTION, CURRENT_YEAR
 
 
 class HTMLRenderer:
@@ -49,10 +49,11 @@ class HTMLRenderer:
             lstrip_blocks=True  # 去除行首的空白
         )
         
-        # 将默认SEO信息添加到全局模板变量中
+        # 将默认SEO信息和全局变量添加到模板环境
         self.env.globals['DEFAULT_TITLE'] = DEFAULT_TITLE
         self.env.globals['DEFAULT_KEYWORDS'] = DEFAULT_KEYWORDS
         self.env.globals['DEFAULT_DESCRIPTION'] = DEFAULT_DESCRIPTION
+        self.env.globals['CURRENT_YEAR'] = CURRENT_YEAR
     
     def render_html(
         self,
@@ -89,24 +90,25 @@ class HTMLRenderer:
             # 组合三个部分
             # head_template.html 包含了从 <!DOCTYPE> 到 header 结束的所有内容，包括 </body></html>
             # body_template.html 包含主要内容（在 <body> 标签内）
-            # foot_template.html 包含 footer 和 </body></html>
+            # foot_template.html 包含 footer 内容（不包含 </body></html>）
             # 
             # 组合策略：
             # 1. 从 head 中提取 </body> 之前的部分
             # 2. 插入 body 内容
-            # 3. 使用 foot 的 </body></html> 部分（如果 foot 包含的话）
+            # 3. 插入 foot 内容（footer）
+            # 4. 使用 head 的 </body></html> 结束标签
             if "</body>" in head_content:
-                # 在 head 的 </body> 之前插入 body 内容
+                # 在 head 的 </body> 之前插入 body 和 foot 内容
                 head_parts = head_content.split("</body>", 1)
                 if len(head_parts) == 2:
-                    # 如果 foot 包含 </body>，使用 foot 的结束标签
+                    # 如果 foot 包含 </body>，使用 foot 的结束标签（兼容旧版本）
                     if "</body>" in foot_content:
                         foot_parts = foot_content.split("</body>", 1)
-                        # head 前半部分 + body 内容 + foot 的 </body></html>
-                        html = head_parts[0] + body_content + "</body>" + (foot_parts[1] if len(foot_parts) > 1 else "")
+                        # head 前半部分 + body 内容 + foot 内容 + foot 的 </body></html>
+                        html = head_parts[0] + body_content + (foot_parts[0] if len(foot_parts) > 0 else foot_content) + "</body>" + (foot_parts[1] if len(foot_parts) > 1 else "")
                     else:
-                        # foot 不包含 </body>，使用 head 的 </body></html>，然后添加 foot
-                        html = head_parts[0] + body_content + "</body>" + head_parts[1] + foot_content
+                        # foot 不包含 </body>，在 </body> 之前插入 body 和 foot，然后使用 head 的 </body></html>
+                        html = head_parts[0] + body_content + foot_content + "</body>" + head_parts[1]
                 else:
                     # 如果没有正确分割，直接拼接
                     html = head_content + body_content + foot_content

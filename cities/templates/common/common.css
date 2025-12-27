@@ -474,11 +474,10 @@
 
 .footer-content .footer-nav {
   border-top: 1px solid #DFDFDF;
-  ;
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 13px 30px;
+  padding: 13px 0;
 }
 
 
@@ -557,20 +556,35 @@
 }
 
 .footer .footer-record {
-  padding: 0 30px;
+  padding: 0;
   border-top: 1px solid #DFDFDF;
-  text-align: center;
   height: 50px;
   line-height: 50px;
   font-size: 13px;
   color: #666;
 }
 
+.footer .footer-record .section-content {
+  padding: 0 20px;
+}
+
 .footer .footer-record .footer-beian {
   line-height: 1;
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  height: 50px;
+}
+
+.footer .footer-record .footer-copyright {
+  display: flex;
+  align-items: center;
+}
+
+.footer .footer-record .footer-beian-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .footer .footer-record .footer-beian .beian-img {

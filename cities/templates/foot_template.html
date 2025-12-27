@@ -1,15 +1,135 @@
-<!-- 
-Dynamic footer from main site: https://www.idcsmart.com/
-This city showcase feature is an additional functionality provided for the main site.
+<footer class="footer">
+  <!-- Footer 导航内容 -->
+  <div class="footer-content">
+    <div class="section-content footer-nav">
+      <!-- 左侧导航链接 -->
+      <div class="footer-nav-left">
+        <!-- 产品 -->
+        <div class="footer-nav-box">
+          <div class="footer-nav-head">产品</div>
+          <div class="footer-nav-cont">
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/business.html" class="link-hover">业务管理系统</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/cloud.html" class="link-hover">云平台管理系统</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/dcim.html" class="link-hover">魔方DCIM系统</a>
+            </div>
+          </div>
+        </div>
 
-Implementation:
-- During HTML generation, fetch the footer from https://www.idcsmart.com/
-- Extract the <div class="section-content section-p "> element
-- Replace {{ main_site_footer }} placeholder with the actual footer HTML
--->
-<div class="section-content section-p ">
-    {{ main_site_footer | safe | default('') }}
-</div>
+        <!-- 服务 -->
+        <div class="footer-nav-box">
+          <div class="footer-nav-head">服务</div>
+          <div class="footer-nav-cont">
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/solution.html" class="link-hover">解决方案</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/announce.html" class="link-hover">服务公告</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/verifydomain.html" class="link-hover">授权查询</a>
+            </div>
+          </div>
+        </div>
 
-</body>
-</html>
+        <!-- 支持 -->
+        <div class="footer-nav-box">
+          <div class="footer-nav-head">支持</div>
+          <div class="footer-nav-cont">
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/helps_center.html" target="_blank" class="link-hover">帮助中心</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/wiki_list.html" target="_blank" class="link-hover">用户指南</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/api_list.html" target="_blank" class="link-hover">开发文档</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 关于 -->
+        <div class="footer-nav-box">
+          <div class="footer-nav-head">关于</div>
+          <div class="footer-nav-cont">
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/about.html" class="link-hover">关于我们</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/join.html" class="link-hover">加入我们</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/partner.html" class="link-hover">合作伙伴</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 快速链接 -->
+        <div class="footer-nav-box">
+          <div class="footer-nav-head">快速链接</div>
+          <div class="footer-nav-cont">
+            <div class="footer-nav-item">
+              <a href="https://www.idcsmart.com/index.html" class="link-hover">首页</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://my.idcsmart.com/shop/" target="_blank" class="link-hover">商店</a>
+            </div>
+            <div class="footer-nav-item">
+              <a href="https://bbs.idcsmart.com/" target="_blank" class="link-hover">论坛</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧联系方式 -->
+      <div class="footer-nav-right">
+        <div class="footer-nav-box">
+          <div class="footer-nav-head">联系我们</div>
+          <div class="footer-nav-cont">
+            <div class="footer-nav-item">
+              <h3>客服热线</h3>
+            </div>
+            <div class="footer-nav-item">
+              <h3>工作时间：9:00-18:00</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 版权和备案信息 -->
+  <div class="footer-record">
+    <div class="section-content">
+      <div class="footer-beian">
+        <!-- 版权信息（靠左） -->
+        <div class="footer-copyright">
+          <span>© {{ CURRENT_YEAR }} 亿人互联</span>
+        </div>
+        <!-- 备案信息（靠右） -->
+        <div class="footer-beian-info">
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow" class="link-hover">
+            <img src="./assets/img/index/beian.png" alt="备案图标" class="beian-img" onerror="this.style.display='none'">
+            <span>京ICP备xxxxxxxx号</span>
+          </a>
+          <span>|</span>
+          <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=xxxxxxxx" target="_blank" rel="nofollow" class="link-hover">
+            <span>京公网安备 xxxxxxxx号</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自定义 Footer 内容（如果模板变量中有） -->
+  {% if main_site_footer %}
+  <div class="footer-custom">
+    {{ main_site_footer | safe }}
+  </div>
+  {% endif %}
+</footer>
+

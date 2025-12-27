@@ -478,6 +478,19 @@ DEFAULT_PAGE_URL = ""
 # 默认footer内容
 DEFAULT_FOOTER = ""
 
+# 获取当前年份（用于版权信息）
+def get_current_year() -> int:
+    """
+    获取当前年份
+    
+    Returns:
+        当前年份（整数）
+    """
+    from datetime import datetime
+    return datetime.now().year
+
+CURRENT_YEAR = get_current_year()
+
 # 直辖市数据中的"市辖区"键名
 MUNICIPALITY_DISTRICTS_KEY = "市辖区"
 
