@@ -20,8 +20,8 @@ from html_renderer import get_renderer
 from config import (
     DATA_FILE, HK_MO_TW_FILE, OUTPUT_DIR,
     REGIONS, REGION_ORDER,
-    ROOT_PAGE_TITLE, DEFAULT_PAGE_URL, DEFAULT_FOOTER,
-    generate_banner_html, get_product_context,
+    DEFAULT_PAGE_URL, DEFAULT_FOOTER,
+    generate_banner_html, get_product_context, get_seo_context,
     simplify_city_name, simplify_province_name, simplify_district_name,
     simplify_special_region_name, MUNICIPALITY_DISTRICTS_KEY
 )
@@ -164,15 +164,19 @@ def generate_root_html(all_data: Dict[str, Any], classified_provinces: dict) -> 
     # 获取产品信息上下文（根页面包含产品信息）
     product_context = get_product_context(include_products=True)
     
+    # 获取SEO信息（根页面使用"全国"前缀，包含页面标题）
+    seo_context = get_seo_context(page_type="root")
+    
     renderer = get_renderer()
     context = {
-        "页面标题": ROOT_PAGE_TITLE,
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
         "banner": banner_html,
         "地区导航列表": region_nav_list,
         # 产品区块变量（从配置中获取）
         **product_context,
+        # SEO信息（从配置中获取，包含页面标题、关键词、描述）
+        **seo_context,
     }
     
     html = renderer.render_html(

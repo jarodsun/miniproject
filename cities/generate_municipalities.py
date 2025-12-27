@@ -20,7 +20,7 @@ from html_renderer import get_renderer
 from config import (
     DATA_FILE, OUTPUT_DIR,
     TITLE_TEMPLATES, DEFAULT_PAGE_URL, DEFAULT_FOOTER,
-    get_product_context, DEFAULT_TEMPLATES, MUNICIPALITY_DISTRICTS_KEY
+    get_product_context, get_seo_context, DEFAULT_TEMPLATES, MUNICIPALITY_DISTRICTS_KEY
 )
 
 
@@ -45,12 +45,11 @@ def generate_municipality_html(municipality_name: str, districts: List[Tuple[str
     # 获取产品信息上下文（非根页面，不包含产品信息）
     product_context = get_product_context(include_products=False)
     
-    # 生成页面标题
-    page_title = TITLE_TEMPLATES["municipality"].format(municipality_name=municipality_name)
+    # 生成SEO信息（包含页面标题）
+    seo_context = get_seo_context(page_type="municipality", municipality_name=municipality_name)
     
     renderer = get_renderer()
     context = {
-        "页面标题": page_title,
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
         "直辖市名称": municipality_name,
@@ -59,6 +58,7 @@ def generate_municipality_html(municipality_name: str, districts: List[Tuple[str
         "banner": "",
         # 产品区块变量（从配置中获取）
         **product_context,
+        **seo_context,
     }
     
     html = renderer.render_html(
@@ -94,12 +94,11 @@ def generate_district_html(
     # 生成导航链接（直辖市只有城市链接，没有省份链接）
     province_link_html = f'        <p>所属城市：<a href="{back_path}index.html">{city_name}</a></p>'
     
-    # 生成页面标题
-    page_title = TITLE_TEMPLATES["district"].format(district_name=district_name, city_name=city_name)
+    # 生成SEO信息（包含页面标题）
+    seo_context = get_seo_context(page_type="district", district_name=district_name)
     
     renderer = get_renderer()
     context = {
-        "页面标题": page_title,
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
         "区县名称": district_name,
@@ -108,6 +107,7 @@ def generate_district_html(
         "城市链接": f"{back_path}index.html",
         "省份链接": province_link_html,
         "下级列表": street_list_html,
+        **seo_context,
     }
     
     html = renderer.render_html(
@@ -134,18 +134,14 @@ def generate_street_html(
     province_name: 省份名称（直辖市名称）
     back_path: 返回上级的路径（用于生成相对链接）
     """
-    # 生成页面标题
-    page_title = TITLE_TEMPLATES["street"].format(
-        street_name=street_name,
-        district_name=district_name,
-        city_name=city_name
-    )
+    # 生成SEO信息（包含页面标题）
+    seo_context = get_seo_context(page_type="street", street_name=street_name)
     
     renderer = get_renderer()
     context = {
-        "页面标题": page_title,
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
+        **seo_context,
         "街道名称": street_name,
         "区县名称": district_name,
         "城市名称": city_name,

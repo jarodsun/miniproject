@@ -20,7 +20,7 @@ from html_renderer import get_renderer
 from config import (
     DATA_FILE, OUTPUT_DIR,
     TITLE_TEMPLATES, DEFAULT_PAGE_URL, DEFAULT_FOOTER,
-    DEFAULT_TEMPLATES
+    DEFAULT_TEMPLATES, get_seo_context
 )
 
 
@@ -36,16 +36,16 @@ def generate_province_html(province_name: str, cities: List[Tuple[str, str]]) ->
         for city_name, city_pinyin in cities
     ])
     
-    # 生成页面标题
-    page_title = TITLE_TEMPLATES["province"].format(province_name=province_name)
+    # 生成SEO信息（包含页面标题）
+    seo_context = get_seo_context(page_type="province", province_name=province_name)
     
     renderer = get_renderer()
     context = {
-        "页面标题": page_title,
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
         "省份名称": province_name,
         "下级列表": city_list_html,
+        **seo_context,
     }
     
     html = renderer.render_html(
@@ -76,17 +76,14 @@ def generate_city_html(
         for district_name, district_pinyin in districts
     ])
     
-    # 生成页面标题
-    page_title = TITLE_TEMPLATES["city"].format(
-        city_name=city_name,
-        province_name=province_name
-    )
+    # 生成SEO信息（包含页面标题）
+    seo_context = get_seo_context(page_type="city", city_name=city_name)
     
     renderer = get_renderer()
     context = {
-        "页面标题": page_title,
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
+        **seo_context,
         "城市名称": city_name,
         "省份名称": province_name,
         "省份链接": "../index.html",
@@ -126,17 +123,14 @@ def generate_district_html(
     # 生成省份链接 HTML（普通省份有城市和省份链接）
     province_link_html = f'        <p>所属城市：<a href="{back_path}index.html">{city_name}</a></p>\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
     
-    # 生成页面标题
-    page_title = TITLE_TEMPLATES["district"].format(
-        district_name=district_name,
-        city_name=city_name
-    )
+    # 生成SEO信息（包含页面标题）
+    seo_context = get_seo_context(page_type="district", district_name=district_name)
     
     renderer = get_renderer()
     context = {
-        "页面标题": page_title,
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
+        **seo_context,
         "区县名称": district_name,
         "城市名称": city_name,
         "省份名称": province_name,
@@ -169,18 +163,14 @@ def generate_street_html(
     province_name: 省份名称
     back_path: 返回上级的路径（用于生成相对链接）
     """
-    # 生成页面标题
-    page_title = TITLE_TEMPLATES["street"].format(
-        street_name=street_name,
-        district_name=district_name,
-        city_name=city_name
-    )
+    # 生成SEO信息（包含页面标题）
+    seo_context = get_seo_context(page_type="street", street_name=street_name)
     
     renderer = get_renderer()
     context = {
-        "页面标题": page_title,
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
+        **seo_context,
         "街道名称": street_name,
         "区县名称": district_name,
         "城市名称": city_name,

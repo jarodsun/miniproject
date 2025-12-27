@@ -17,7 +17,7 @@ except ImportError:
     print("错误: jinja2 未安装，请运行: pip install jinja2")
     exit(1)
 
-from config import TEMPLATE_DIR, DEFAULT_TITLE
+from config import TEMPLATE_DIR, DEFAULT_TITLE, DEFAULT_KEYWORDS, DEFAULT_DESCRIPTION
 
 
 class HTMLRenderer:
@@ -49,8 +49,10 @@ class HTMLRenderer:
             lstrip_blocks=True  # 去除行首的空白
         )
         
-        # 将默认标题添加到全局模板变量中
+        # 将默认SEO信息添加到全局模板变量中
         self.env.globals['DEFAULT_TITLE'] = DEFAULT_TITLE
+        self.env.globals['DEFAULT_KEYWORDS'] = DEFAULT_KEYWORDS
+        self.env.globals['DEFAULT_DESCRIPTION'] = DEFAULT_DESCRIPTION
     
     def render_html(
         self,

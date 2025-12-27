@@ -63,8 +63,7 @@ REGION_ORDER = [
 ]
 
 # ==================== 页面标题配置 ====================
-# 根页面标题
-ROOT_PAGE_TITLE = "IDC服务器托管,BGP带宽,云服务器,海外云,Deepseek,云WAF,CDN | 亿人互联"
+# 注意：根页面标题现在在SEO配置中定义（使用"全国"前缀）
 
 # 页面标题格式模板
 TITLE_TEMPLATES = {
@@ -80,6 +79,153 @@ TITLE_TEMPLATES = {
 
 # 默认标题（当模板未找到时使用）
 DEFAULT_TITLE = "IDC服务器托管,BGP带宽,云服务器,海外云,Deepseek,云WAF,CDN | 亿人互联"
+
+# ==================== SEO配置 ====================
+# 基础服务关键词列表（用于自动生成SEO信息）
+BASE_SERVICE_KEYWORDS = [
+    "IDC服务器托管",
+    "BGP带宽",
+    "云服务器",
+    "海外云",
+    "Deepseek",
+    "云WAF",
+    "CDN"
+]
+
+# 公司名称
+COMPANY_NAME = "亿人互联"
+
+# 根页面SEO信息（使用"全国"前缀）
+ROOT_PAGE_TITLE = f"全国{',全国'.join(BASE_SERVICE_KEYWORDS)} - {COMPANY_NAME}"
+ROOT_PAGE_KEYWORDS = f"全国{',全国'.join(BASE_SERVICE_KEYWORDS)},{COMPANY_NAME}"
+ROOT_PAGE_DESCRIPTION = f"{COMPANY_NAME}全国客户服务中心，提供全国{'、全国'.join(BASE_SERVICE_KEYWORDS)}等服务，为企业提供稳定可靠的云计算解决方案。"
+
+# 默认SEO信息（用于其他页面，当无法生成时使用）
+DEFAULT_KEYWORDS = f"{','.join(BASE_SERVICE_KEYWORDS)},{COMPANY_NAME}"
+DEFAULT_DESCRIPTION = f"{COMPANY_NAME}提供专业的{'、'.join(BASE_SERVICE_KEYWORDS)}等服务。"
+
+
+def generate_seo_keywords(region_prefix: str) -> str:
+    """
+    根据地区前缀生成SEO关键词
+    
+    Args:
+        region_prefix: 地区前缀（如"全国"、"北京市"、"北京市朝阳区"等）
+        
+    Returns:
+        格式化的关键词字符串
+    """
+    keywords = [f"{region_prefix}{keyword}" for keyword in BASE_SERVICE_KEYWORDS]
+    keywords.append(COMPANY_NAME)
+    return ",".join(keywords)
+
+
+def generate_seo_description(region_prefix: str, region_type: str = "客户服务中心") -> str:
+    """
+    根据地区前缀生成SEO描述
+    
+    Args:
+        region_prefix: 地区前缀（如"全国"、"北京市"、"北京市朝阳区"等）
+        region_type: 地区类型描述（如"客户服务中心"、"地区"等）
+        
+    Returns:
+        格式化的描述字符串
+    """
+    services = "、".join([f"{region_prefix}{keyword}" for keyword in BASE_SERVICE_KEYWORDS])
+    return f"{COMPANY_NAME}{region_prefix}{region_type}，提供{services}等服务，为企业提供稳定可靠的云计算解决方案。"
+
+
+def generate_seo_title(region_prefix: str) -> str:
+    """
+    根据地区前缀生成SEO标题
+    
+    Args:
+        region_prefix: 地区前缀（如"全国"、"北京市"、"北京市朝阳区"等）
+        
+    Returns:
+        格式化的标题字符串，格式：{地区前缀}{服务1},{地区前缀}{服务2},... - {公司名}
+    """
+    title_parts = [f"{region_prefix}{keyword}" for keyword in BASE_SERVICE_KEYWORDS]
+    return f"{','.join(title_parts)} - {COMPANY_NAME}"
+
+
+def get_seo_context(page_type: str = None, **kwargs) -> Dict[str, str]:
+    """
+    获取SEO信息的上下文字典（用于模板渲染）
+    包括页面标题、关键词和描述
+    
+    Args:
+        page_type: 页面类型（如 "root", "province", "city", "district" 等）
+        **kwargs: 页面相关的变量（如 province_name, city_name 等）
+        
+    Returns:
+        SEO信息的上下文字典，包含 "页面标题"、"页面关键词" 和 "页面描述"
+    """
+    if page_type == "root":
+        # 根页面使用"全国"前缀
+        title = ROOT_PAGE_TITLE
+        keywords = ROOT_PAGE_KEYWORDS
+        description = ROOT_PAGE_DESCRIPTION
+    elif page_type == "province" and "province_name" in kwargs:
+        # 省份页面：使用省份名称作为前缀
+        region_prefix = kwargs["province_name"]
+        title = generate_seo_title(region_prefix)
+        keywords = generate_seo_keywords(region_prefix)
+        description = generate_seo_description(region_prefix, "地区")
+    elif page_type == "municipality" and "municipality_name" in kwargs:
+        # 直辖市页面：使用直辖市名称作为前缀
+        region_prefix = kwargs["municipality_name"]
+        title = generate_seo_title(region_prefix)
+        keywords = generate_seo_keywords(region_prefix)
+        description = generate_seo_description(region_prefix, "地区")
+    elif page_type == "city" and "city_name" in kwargs:
+        # 城市页面：使用城市名称作为前缀
+        region_prefix = kwargs["city_name"]
+        title = generate_seo_title(region_prefix)
+        keywords = generate_seo_keywords(region_prefix)
+        description = generate_seo_description(region_prefix, "地区")
+    elif page_type == "district" and "district_name" in kwargs:
+        # 区县页面：使用区县名称作为前缀
+        region_prefix = kwargs["district_name"]
+        title = generate_seo_title(region_prefix)
+        keywords = generate_seo_keywords(region_prefix)
+        description = generate_seo_description(region_prefix, "地区")
+    elif page_type == "street" and "street_name" in kwargs:
+        # 街道页面：使用街道名称作为前缀
+        region_prefix = kwargs["street_name"]
+        title = generate_seo_title(region_prefix)
+        keywords = generate_seo_keywords(region_prefix)
+        description = generate_seo_description(region_prefix, "地区")
+    elif page_type == "region" and "region_name" in kwargs:
+        # 区域页面（港澳台）：使用区域名称作为前缀
+        region_prefix = kwargs["region_name"]
+        title = generate_seo_title(region_prefix)
+        keywords = generate_seo_keywords(region_prefix)
+        description = generate_seo_description(region_prefix, "地区")
+    elif page_type == "taiwan_city" and "city_name" in kwargs:
+        # 台湾城市页面：使用城市名称作为前缀
+        region_prefix = kwargs["city_name"]
+        title = generate_seo_title(region_prefix)
+        keywords = generate_seo_keywords(region_prefix)
+        description = generate_seo_description(region_prefix, "地区")
+    elif page_type == "taiwan_district" and "district_name" in kwargs:
+        # 台湾区县页面：使用区县名称作为前缀
+        region_prefix = kwargs["district_name"]
+        title = generate_seo_title(region_prefix)
+        keywords = generate_seo_keywords(region_prefix)
+        description = generate_seo_description(region_prefix, "地区")
+    else:
+        # 使用默认SEO信息
+        title = DEFAULT_TITLE
+        keywords = DEFAULT_KEYWORDS
+        description = DEFAULT_DESCRIPTION
+    
+    return {
+        "页面标题": title,
+        "页面关键词": keywords,
+        "页面描述": description,
+    }
+
 
 # ==================== 产品信息配置 ====================
 # 根页面产品信息（用于根目录首页）
