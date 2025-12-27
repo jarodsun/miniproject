@@ -16,18 +16,25 @@
 
 ```
 cities/
-├── common.py                 # 公共函数模块（共享工具函数）
-├── generate_all.py           # 主入口脚本（推荐使用）
-├── generate_mainland.py      # 处理普通省份和直辖市
-├── generate_hk_mo_tw.py      # 处理港澳台
-├── generate_root_index.py    # 生成根目录首页
-├── generate_html_v1.py       # 旧版本脚本（已废弃）
-├── data/                     # 数据文件目录
-│   ├── pcas.json            # 大陆省份数据
-│   └── HK-MO-TW.json        # 港澳台数据
-├── templates/                # 模板文件目录（当前未使用）
-├── output/                   # 输出目录（生成的 HTML 文件）
-└── docs/                     # 文档目录
+├── common.py                    # 公共函数模块（共享工具函数）
+├── generate_all.py              # 主入口脚本（推荐使用）
+├── generate_municipalities.py  # 处理直辖市（北京市、天津市、上海市、重庆市）
+├── generate_provinces.py        # 处理普通省份
+├── generate_hk_mo_tw.py         # 处理港澳台
+├── generate_root_index.py       # 生成根目录首页
+├── generate_mainland.py         # 旧版本（已拆分，保留作为参考）
+├── generate_html_v1.py          # 旧版本脚本（已废弃）
+├── data/                        # 数据文件目录
+│   ├── pcas.json               # 大陆省份数据
+│   └── HK-MO-TW.json           # 港澳台数据
+├── templates/                   # 模板文件目录（当前未使用）
+├── output/                      # 输出目录（生成的 HTML 文件）
+└── docs/                        # 文档目录
+    ├── DEVELOPMENT.md           # 开发文档
+    ├── notes.md                 # 优化分析报告
+    ├── requirements_v1.md       # 需求文档 v1.0
+    ├── requirements_v2.md       # 需求文档 v2.0
+    └── README_SCRIPTS.md        # 脚本使用说明
 ```
 
 ## 技术栈
@@ -87,8 +94,9 @@ TAIWAN = "台湾省"
 **执行流程**：
 
 1. 生成根目录首页（`generate_root_index.py`）
-2. 生成普通省份和直辖市（`generate_mainland.py`）
-3. 生成港澳台（`generate_hk_mo_tw.py`）
+2. 生成直辖市（`generate_municipalities.py`）
+3. 生成普通省份（`generate_provinces.py`）
+4. 生成港澳台（`generate_hk_mo_tw.py`）
 
 **特点**：
 
@@ -103,31 +111,49 @@ TAIWAN = "台湾省"
 python3 generate_all.py
 ```
 
-### 3. `generate_mainland.py` - 处理大陆省份和直辖市
+### 3. `generate_municipalities.py` - 处理直辖市
 
 **功能**：
 
 - 读取 `pcas.json` 数据文件
-- 处理普通省份（省 -> 市 -> 区 -> 街道）
-- 处理四个直辖市（市 -> 区 -> 街道，跳过"市辖区"层）
+- 处理四个直辖市（北京市、天津市、上海市、重庆市）
+- 层级结构：市 -> 区 -> 街道（跳过"市辖区"层）
+
+**核心函数**：
+
+- `generate_municipality_html()`: 生成直辖市级别 HTML
+- `generate_district_html()`: 生成区级别 HTML（直辖市专用）
+- `generate_street_html()`: 生成街道级别 HTML（直辖市专用）
+- `process_municipality()`: 处理直辖市逻辑
+
+**特殊处理**：
+
+- 需要跳过"市辖区"这一占位层
+- 路径只有三层（市 -> 区 -> 街道）
+- 导航链接不包含省份层级（因为直辖市本身就是省级）
+
+### 4. `generate_provinces.py` - 处理普通省份
+
+**功能**：
+
+- 读取 `pcas.json` 数据文件
+- 处理所有普通省份（排除四个直辖市）
+- 层级结构：省 -> 市 -> 区 -> 街道
 
 **核心函数**：
 
 - `generate_province_html()`: 生成省级别 HTML
-- `generate_municipality_html()`: 生成直辖市级别 HTML
 - `generate_city_html()`: 生成市级别 HTML
-- `generate_district_html()`: 生成区级别 HTML
-- `generate_street_html()`: 生成街道级别 HTML
-- `process_municipality()`: 处理直辖市逻辑
+- `generate_district_html()`: 生成区级别 HTML（普通省份专用）
+- `generate_street_html()`: 生成街道级别 HTML（普通省份专用）
 - `process_province()`: 处理普通省份逻辑
 
 **特殊处理**：
 
-- 直辖市需要跳过"市辖区"这一占位层
-- 直辖市的路径只有三层（市 -> 区 -> 街道）
-- 普通省份的路径有四层（省 -> 市 -> 区 -> 街道）
+- 路径有四层（省 -> 市 -> 区 -> 街道）
+- 导航链接包含完整的层级关系（区、市、省）
 
-### 4. `generate_hk_mo_tw.py` - 处理港澳台
+### 5. `generate_hk_mo_tw.py` - 处理港澳台
 
 **功能**：
 
@@ -150,7 +176,7 @@ python3 generate_all.py
 - 香港/澳门：三层结构（特别行政区 -> 区域 -> 区），没有街道层级
 - 台湾：三层结构（省 -> 市/县 -> 区），没有街道层级
 
-### 5. `generate_root_index.py` - 生成根目录首页
+### 6. `generate_root_index.py` - 生成根目录首页
 
 **功能**：
 
@@ -432,10 +458,13 @@ python3 generate_all.py
 # 1. 生成根目录首页
 python3 generate_root_index.py
 
-# 2. 生成普通省份和直辖市的 HTML
-python3 generate_mainland.py
+# 2. 生成直辖市的 HTML
+python3 generate_municipalities.py
 
-# 3. 生成港澳台的 HTML
+# 3. 生成普通省份的 HTML
+python3 generate_provinces.py
+
+# 4. 生成港澳台的 HTML
 python3 generate_hk_mo_tw.py
 ```
 
