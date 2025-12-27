@@ -1,5 +1,175 @@
-<div class="root">
-    <h1>中国行政区划</h1>
-    {{ 地区分类内容 | safe }}
+<!-- 面包屑导航 -->
+<div class="breadcrumb">
+    <div class="section-content">
+        <ul>
+            <li><a href="/">首页</a></li>
+            <li>></li>
+            <li>地区导航</li>
+        </ul>
+    </div>
+</div>
+
+<!-- 两栏布局容器 -->
+<div class="section-content">
+<div class="two-column-layout">
+    <!-- 左侧栏 -->
+    <div class="left-column">
+        <!-- Banner 轮播区域 -->
+        <div class="banner-section">
+            {{ banner | safe }}
+        </div>
+
+        <!-- 云服务器产品购买区块 -->
+        <div class="product-section">
+            <div class="product-header">
+                <h2>云服务器</h2>
+            </div>
+            
+            <ul class="product-list">
+                <!-- 产品区块1 -->
+                <li class="product-item">
+                    <div class="product-name">
+                        <p>{{ 产品名称1 | default('入门型优惠套餐') }}</p>
+                        <p>{{ 地区信息1 | default('香港二区') }}</p>
+                    </div>
+                    <div class="product-spec">
+                        <p><span>规格</span>{{ 规格1 | default('1核 4G') }}</p>
+                        <p><span>带宽</span>{{ 带宽1 | default('2M') }}</p>
+                        <p><span>独享IP</span>{{ 独享IP1 | default('1个') }}</p>
+                    </div>
+                    <div class="product-price">
+                        <p>
+                            <span>优惠价</span>
+                            <strong>{{ 优惠价1 | default('145') }}</strong>
+                            <span>元/首月</span>
+                        </p>
+                        <p>原价：{{ 原价1 | default('145') }}元/月</p>
+                    </div>
+                    <a href="{{ 购买链接1 | default('#') }}" class="buy-btn">立即购买</a>
+                </li>
+                
+                <!-- 产品区块2 -->
+                <li class="product-item">
+                    <div class="product-name">
+                        <p>{{ 产品名称2 | default('独立体验套餐') }}</p>
+                        <p>{{ 地区信息2 | default('香港二区') }}</p>
+                    </div>
+                    <div class="product-spec">
+                        <p><span>规格</span>{{ 规格2 | default('4核 12G') }}</p>
+                        <p><span>带宽</span>{{ 带宽2 | default('5M') }}</p>
+                        <p><span>独享IP</span>{{ 独享IP2 | default('1个') }}</p>
+                    </div>
+                    <div class="product-price">
+                        <p>
+                            <span>优惠价</span>
+                            <strong>{{ 优惠价2 | default('520') }}</strong>
+                            <span>元/首月</span>
+                        </p>
+                        <p>原价：{{ 原价2 | default('520') }}元/月</p>
+                    </div>
+                    <a href="{{ 购买链接2 | default('#') }}" class="buy-btn">立即购买</a>
+                </li>
+                
+                <!-- 产品区块3 -->
+                <li class="product-item">
+                    <div class="product-name">
+                        <p>{{ 产品名称3 | default('畅销独立套餐') }}</p>
+                        <p>{{ 地区信息3 | default('华中一区') }}</p>
+                    </div>
+                    <div class="product-spec">
+                        <p><span>规格</span>{{ 规格3 | default('4核 8G') }}</p>
+                        <p><span>带宽</span>{{ 带宽3 | default('10M') }}</p>
+                        <p><span>独享IP</span>{{ 独享IP3 | default('1个') }}</p>
+                    </div>
+                    <div class="product-price">
+                        <p>
+                            <span>优惠价</span>
+                            <strong>{{ 优惠价3 | default('398') }}</strong>
+                            <span>元/首月</span>
+                        </p>
+                        <p>原价：{{ 原价3 | default('553') }}元/月</p>
+                    </div>
+                    <a href="{{ 购买链接3 | default('#') }}" class="buy-btn">立即购买</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 云服务器特点区块 -->
+        <div class="features-section">
+            <h2 class="features-title">| 云服务器特点</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">灵活和弹性</h3>
+                        <p class="feature-desc">根据业务的发展趋势,您可随时对云资源进行横向和纵向的伸缩,杜绝资源浪费</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">高性能</h3>
+                        <p class="feature-desc">优异的网络处理能力满足各种业务应用要求,各项性能指标业界领先,更有SSD盘云主机,提供超高IOPS性能</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">简单易用</h3>
+                        <p class="feature-desc">用户拥有云服务器的管理员帐号,对服务器有完全的控制权,管理服务器就像管理您的计算机一样简单方便</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">稳定和可靠</h3>
+                        <p class="feature-desc">采用RAID进行数据保护,防止数据丢失,承诺99.95%的服务可用性,数据可靠性不低于99.9999%</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">安全保障</h3>
+                        <p class="feature-desc">用户之间100%的完全网络隔离,确保数据安全,并提供丰富的监控和安全工具</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">节省成本</h3>
+                        <p class="feature-desc">服务器部署在云端,极大节省了您前期搭建基础网络设施的成本和后期的维护成本</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧栏 -->
+    <div class="right-column">
+        <!-- 地区导航列表 -->
+        <div class="city-nav-section">
+            <div class="city-nav-list">
+                {{ 地区导航列表 | safe }}
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 

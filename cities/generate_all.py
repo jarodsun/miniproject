@@ -17,6 +17,8 @@ import sys
 import subprocess
 from pathlib import Path
 
+from common import copy_template_assets
+
 # 配置
 BASE_DIR = Path(__file__).parent
 
@@ -24,8 +26,8 @@ BASE_DIR = Path(__file__).parent
 SCRIPTS = [
     "generate_root_index.py",
     "generate_municipalities.py",
-    "generate_provinces.py",
-    "generate_hk_mo_tw.py",
+    # "generate_provinces.py",
+    # "generate_hk_mo_tw.py",
 ]
 
 
@@ -73,6 +75,9 @@ def main():
     print("="*60)
     print("开始生成所有 HTML 文件")
     print("="*60)
+    
+    # 首先复制模板资源文件
+    copy_template_assets()
     
     success_count = 0
     fail_count = 0

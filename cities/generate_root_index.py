@@ -10,10 +10,10 @@
 
 import json
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 
 from common import (
-    BASE_DIR, OUTPUT_DIR,
+    BASE_DIR, OUTPUT_DIR, MUNICIPALITIES, HONG_KONG, MACAO, TAIWAN,
     to_pinyin, write_html_file
 )
 from html_renderer import get_renderer
@@ -89,39 +89,149 @@ def classify_provinces(provinces: List[Tuple[str, str]]) -> dict:
     return classified
 
 
-def generate_root_html(classified_provinces: dict) -> str:
+def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dict) -> str:
     """
-    生成根目录 index.html（所有省份/直辖市的总入口，按地区分类）
-    classified_provinces: {地区名称: [(省份名称, 省份拼音), ...], ...}
+    生成地区导航列表 HTML（参考 yisu.com/city/ 的格式）
+    
+    Args:
+        all_data: 完整的数据字典
+        classified_provinces: 按地区分类的省份字典
+        
+    Returns:
+        地区导航列表的 HTML 字符串
     """
-    sections_html = []
+    nav_items = []
     
     for region_name in REGION_ORDER:
         provinces = classified_provinces.get(region_name, [])
         if not provinces:
             continue
         
-        province_list_html = "\n".join([
-            f'            <li><a href="{province_pinyin}/index.html">{province_name}</a></li>'
-            for province_name, province_pinyin in provinces
-        ])
+        # 生成该地区的导航内容
+        region_dl_items = []
         
-        section_html = f"""        <div class="region-section">
-            <h2>{region_name}</h2>
-            <ul>
-{province_list_html}
-            </ul>
-        </div>"""
-        sections_html.append(section_html)
+        for province_name, province_pinyin in provinces:
+            province_data = all_data.get(province_name, {})
+            
+            if province_name in MUNICIPALITIES:
+                # 直辖市：直接列出区县
+                shixiaqu_data = province_data.get("市辖区", {})
+                if shixiaqu_data:
+                    districts = list(shixiaqu_data.keys())
+                    district_links = " | ".join([
+                        f'<a href="{province_pinyin}/{to_pinyin(district)}/index.html">{district.replace("区", "").replace("县", "")}</a>'
+                        for district in districts
+                    ])
+                    province_display = province_name.replace("市", "")
+                    region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{district_links}</dd>')
+                else:
+                    province_display = province_name.replace("市", "")
+                    region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt>')
+            
+            elif province_name in [HONG_KONG, MACAO]:
+                # 香港/澳门：列出区域
+                regions = list(province_data.keys())
+                region_links = " | ".join([
+                    f'<a href="{province_pinyin}/{to_pinyin(region)}/index.html">{region}</a>'
+                    for region in regions
+                ])
+                province_display = province_name.replace("特别行政区", "")
+                region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{region_links}</dd>')
+            
+            elif province_name == TAIWAN:
+                # 台湾：列出城市/县
+                cities = list(province_data.keys())
+                city_links = " | ".join([
+                    f'<a href="{province_pinyin}/{to_pinyin(city)}/index.html">{city}</a>'
+                    for city in cities
+                ])
+                province_display = province_name.replace("省", "")
+                region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{city_links}</dd>')
+            
+            else:
+                # 普通省份：列出城市
+                cities = list(province_data.keys())
+                # 简化城市名称显示（移除常见的后缀）
+                city_links = " | ".join([
+                    f'<a href="{province_pinyin}/{to_pinyin(city)}/index.html">{city.replace("市", "").replace("地区", "").replace("自治州", "").replace("盟", "").replace("县", "")}</a>'
+                    for city in cities
+                ])
+                # 简化省份名称显示
+                province_display = province_name.replace("省", "").replace("自治区", "").replace("壮族自治区", "").replace("维吾尔自治区", "").replace("回族自治区", "")
+                region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{city_links}</dd>')
+        
+        # 组合该地区的导航（使用 <ul><li> 结构，参考页面格式）
+        if region_dl_items:
+            region_nav = f'<li><strong>{region_name}：</strong><dl>{"".join(region_dl_items)}</dl></li>'
+            nav_items.append(region_nav)
     
-    sections_content = "\n".join(sections_html)
+    # 返回完整的导航列表，使用 <ul> 包裹
+    return f'<ul class="region-nav-list">{"".join(nav_items)}</ul>'
+
+
+def generate_root_html(all_data: Dict[str, Any], classified_provinces: dict) -> str:
+    """
+    生成根目录 index.html（所有省份/直辖市的总入口，按地区分类）
+    
+    Args:
+        all_data: 完整的数据字典
+        classified_provinces: {地区名称: [(省份名称, 省份拼音), ...], ...}
+    """
+    # 生成地区导航列表
+    region_nav_list = generate_region_nav_list(all_data, classified_provinces)
+    
+    # 生成 Banner HTML（使用同一张图片进行轮播）
+    banner_html = """
+        <div class="banner-carousel">
+            <div class="banner-item active">
+                <a href="#"><img src="./assets/img/banner1.jpg" alt="活动横幅"></a>
+            </div>
+            <div class="banner-item">
+                <a href="#"><img src="./assets/img/banner1.jpg" alt="活动横幅"></a>
+            </div>
+            <div class="banner-item">
+                <a href="#"><img src="./assets/img/banner1.jpg" alt="活动横幅"></a>
+            </div>
+            <div class="banner-indicators">
+                <span class="indicator active" data-slide="0"></span>
+                <span class="indicator" data-slide="1"></span>
+                <span class="indicator" data-slide="2"></span>
+            </div>
+        </div>
+    """
     
     renderer = get_renderer()
     context = {
         "页面标题": "中国行政区划 - 总入口",
         "当前页面URL地址": "",
         "main_site_footer": "",
-        "地区分类内容": sections_content,
+        "banner": banner_html,
+        "地区导航列表": region_nav_list,
+        # 产品区块变量（使用默认值）
+        "产品名称1": "入门型优惠套餐",
+        "地区信息1": "香港二区",
+        "规格1": "1核 4G",
+        "带宽1": "2M",
+        "独享IP1": "1个",
+        "优惠价1": "145",
+        "原价1": "145",
+        "购买链接1": "#",
+        "产品名称2": "独立体验套餐",
+        "地区信息2": "香港二区",
+        "规格2": "4核 12G",
+        "带宽2": "5M",
+        "独享IP2": "1个",
+        "优惠价2": "520",
+        "原价2": "520",
+        "购买链接2": "#",
+        "产品名称3": "畅销独立套餐",
+        "地区信息3": "华中一区",
+        "规格3": "4核 8G",
+        "带宽3": "10M",
+        "独享IP3": "1个",
+        "优惠价3": "398",
+        "原价3": "553",
+        "购买链接3": "#",
     }
     
     html = renderer.render_html(
@@ -186,7 +296,7 @@ def main():
     
     # 生成根目录 index.html
     print("生成根目录 index.html...")
-    root_html = generate_root_html(classified_provinces)
+    root_html = generate_root_html(all_data, classified_provinces)
     write_html_file(OUTPUT_DIR / "index.html", root_html)
     print(f"已生成: 根目录总入口 index.html")
     print(f"包含 {total_count} 个省份/直辖市/特别行政区")
