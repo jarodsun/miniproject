@@ -1,22 +1,26 @@
-# 开发文档 v1
+# 开发文档 v2
 
 ## 项目概述
 
-本项目是一个批量生成中国行政区划静态 HTML 页面的系统。系统通过读取 JSON 数据文件，按照拼音建立文件夹结构，并生成对应的 HTML 文件。
+本项目是一个批量生成中国行政区划静态 HTML 页面的系统。系统通过读取 JSON 数据文件，按照拼音建立文件夹结构，并使用 Jinja2 模板引擎生成对应的 HTML 文件。
 
 ### 核心功能
 
 - 读取 `pcas.json` 和 `HK-MO-TW.json` 数据文件
 - 将中文地名转换为拼音作为文件夹名
-- 生成省、市、区、街道四个层级的 HTML 页面
+- 使用 Jinja2 模板引擎生成省、市、区、街道四个层级的 HTML 页面
 - 处理直辖市、普通省份、港澳台等不同数据结构的特殊逻辑
-- 生成根目录总入口页面
+- 生成根目录总入口页面（按地区分类，包含 Banner 和产品信息）
+- 自动生成 SEO 信息（页面标题、关键词、描述）
+- 自动复制模板资源文件（CSS、JS、图片等）到输出目录
 
 ## 项目结构
 
 ```
 cities/
 ├── common.py                    # 公共函数模块（共享工具函数）
+├── config.py                    # 配置管理模块（统一管理所有配置）
+├── html_renderer.py             # HTML 模板渲染模块（使用 Jinja2）
 ├── generate_all.py              # 主入口脚本（推荐使用）
 ├── generate_municipalities.py  # 处理直辖市（北京市、天津市、上海市、重庆市）
 ├── generate_provinces.py        # 处理普通省份
@@ -27,7 +31,19 @@ cities/
 ├── data/                        # 数据文件目录
 │   ├── pcas.json               # 大陆省份数据
 │   └── HK-MO-TW.json           # 港澳台数据
-├── templates/                   # 模板文件目录（当前未使用）
+├── templates/                   # 模板文件目录（Jinja2 模板）
+│   ├── head_template.html       # 页面头部模板
+│   ├── foot_template.html       # 页面底部模板
+│   ├── body_root_template.html  # 根页面内容模板
+│   ├── body_province_template.html    # 省份页面内容模板
+│   ├── body_municipality_template.html # 直辖市页面内容模板
+│   ├── body_city_template.html  # 城市页面内容模板
+│   ├── body_district_template.html    # 区县页面内容模板
+│   ├── body_street_template.html      # 街道页面内容模板
+│   ├── assets/                 # 静态资源（图片、字体等）
+│   ├── css/                    # 样式文件
+│   ├── js/                     # JavaScript 文件
+│   └── ...                     # 其他资源文件
 ├── output/                      # 输出目录（生成的 HTML 文件）
 └── docs/                        # 文档目录
     ├── DEVELOPMENT.md           # 开发文档
@@ -46,12 +62,17 @@ cities/
   ```bash
   pip install pypinyin
   ```
+- **jinja2**: 模板引擎（用于 HTML 模板渲染）
+  ```bash
+  pip install jinja2
+  ```
 - **标准库**:
   - `json`: JSON 数据解析
   - `pathlib`: 文件路径操作
   - `subprocess`: 子进程管理（用于 `generate_all.py`）
   - `typing`: 类型提示
   - `re`: 正则表达式
+  - `shutil`: 文件复制（用于复制模板资源）
 
 ### 编码规范
 
@@ -63,7 +84,7 @@ cities/
 
 ### 1. `common.py` - 公共函数模块
 
-**功能**：包含所有脚本共享的工具函数和配置常量
+**功能**：包含所有脚本共享的工具函数
 
 **主要函数**：
 
@@ -76,27 +97,75 @@ cities/
   - 功能：写入 HTML 文件
   - 实现：自动创建父目录，使用 UTF-8 编码写入
 
-**配置常量**：
+- `copy_template_assets()`
+  - 功能：将 `templates/` 目录下的资源文件（CSS、JS、图片等）复制到 `output/` 目录
+  - 实现：从 `config.py` 读取需要复制的文件夹和文件列表，使用 `shutil` 进行复制
+  - 用途：确保生成的 HTML 页面可以正确加载样式和脚本
 
-```python
-BASE_DIR = Path(__file__).parent          # 项目根目录
-OUTPUT_DIR = BASE_DIR / "output"          # 输出目录
-MUNICIPALITIES = ["北京市", "天津市", "上海市", "重庆市"]  # 四个直辖市
-HONG_KONG = "香港特别行政区"
-MACAO = "澳门特别行政区"
-TAIWAN = "台湾省"
-```
+**注意**：配置常量已迁移到 `config.py` 模块
 
-### 2. `generate_all.py` - 主入口脚本
+### 2. `config.py` - 配置管理模块
+
+**功能**：统一管理所有配置项，包括路径、地区分类、SEO、产品信息、Banner、模板等
+
+**主要配置项**：
+
+- **路径配置**：`BASE_DIR`、`OUTPUT_DIR`、`DATA_DIR`、`TEMPLATE_DIR`、数据文件路径
+- **地区分类配置**：`MUNICIPALITIES`、`HONG_KONG`、`MACAO`、`TAIWAN`、`REGIONS`、`REGION_ORDER`
+- **SEO 配置**：
+  - `BASE_SERVICE_KEYWORDS`：基础服务关键词列表
+  - `get_seo_context()`：根据页面类型自动生成 SEO 信息（标题、关键词、描述）
+  - 支持根页面、省份、城市、区县、街道等不同页面类型的 SEO 生成
+- **产品信息配置**：
+  - `ROOT_PAGE_PRODUCTS`：根页面显示的产品信息
+  - `get_product_context()`：获取产品信息上下文（根页面包含产品，其他页面为空）
+- **Banner 配置**：
+  - `BANNER_IMAGE_PATH`、`BANNER_ALT_TEXT`、`BANNER_LINK`、`BANNER_COUNT`
+  - `generate_banner_html()`：生成 Banner HTML（支持轮播）
+- **模板配置**：`DEFAULT_TEMPLATES`：默认模板文件名映射
+- **资源复制配置**：`FOLDERS_TO_COPY`、`FILES_TO_COPY`：需要复制的文件夹和文件列表
+- **名称简化规则**：
+  - `simplify_city_name()`、`simplify_province_name()`、`simplify_district_name()`、`simplify_special_region_name()`
+  - 用于在根页面导航中简化显示名称（移除后缀）
+- **生成脚本配置**：`GENERATION_SCRIPTS`：脚本执行顺序列表
+
+### 3. `html_renderer.py` - HTML 模板渲染模块
+
+**功能**：使用 Jinja2 模板引擎渲染 HTML 模板
+
+**核心类**：
+
+- `HTMLRenderer`：HTML 模板渲染器类
+  - 使用 `FileSystemLoader` 从 `templates/` 目录加载模板
+  - 支持自动转义 HTML 特殊字符
+  - 组合 `head`、`body`、`foot` 三个模板生成完整 HTML
+
+**主要方法**：
+
+- `render_html(head_template, body_template, foot_template, context)`
+  - 功能：组合三个模板生成完整 HTML
+  - 参数：
+    - `head_template`：头部模板文件名（如 `head_template.html`）
+    - `body_template`：内容模板文件名（如 `body_province_template.html`）
+    - `foot_template`：底部模板文件名（如 `foot_template.html`）
+    - `context`：模板变量字典
+  - 返回：完整的 HTML 字符串
+
+**全局函数**：
+
+- `get_renderer()`：获取全局模板渲染器实例（单例模式）
+
+### 4. `generate_all.py` - 主入口脚本
 
 **功能**：统一调用所有生成脚本，按顺序执行
 
 **执行流程**：
 
-1. 生成根目录首页（`generate_root_index.py`）
-2. 生成直辖市（`generate_municipalities.py`）
-3. 生成普通省份（`generate_provinces.py`）
-4. 生成港澳台（`generate_hk_mo_tw.py`）
+1. **复制模板资源文件**：调用 `copy_template_assets()` 将 CSS、JS、图片等资源复制到 `output/` 目录
+2. 生成根目录首页（`generate_root_index.py`）
+3. 生成直辖市（`generate_municipalities.py`）
+4. 生成普通省份（`generate_provinces.py`）
+5. 生成港澳台（`generate_hk_mo_tw.py`）
 
 **特点**：
 
@@ -104,6 +173,7 @@ TAIWAN = "台湾省"
 - 提供执行状态反馈
 - 统计成功/失败数量
 - 即使某个脚本失败，也会继续执行后续脚本
+- 脚本执行顺序从 `config.py` 的 `GENERATION_SCRIPTS` 配置中读取
 
 **使用方法**：
 
@@ -111,7 +181,7 @@ TAIWAN = "台湾省"
 python3 generate_all.py
 ```
 
-### 3. `generate_municipalities.py` - 处理直辖市
+### 5. `generate_municipalities.py` - 处理直辖市
 
 **功能**：
 
@@ -121,10 +191,16 @@ python3 generate_all.py
 
 **核心函数**：
 
-- `generate_municipality_html()`: 生成直辖市级别 HTML
-- `generate_district_html()`: 生成区级别 HTML（直辖市专用）
-- `generate_street_html()`: 生成街道级别 HTML（直辖市专用）
+- `generate_municipality_html()`: 生成直辖市级别 HTML（使用模板渲染）
+- `generate_district_html()`: 生成区级别 HTML（直辖市专用，使用模板渲染）
+- `generate_street_html()`: 生成街道级别 HTML（直辖市专用，使用模板渲染）
 - `process_municipality()`: 处理直辖市逻辑
+
+**模板使用**：
+
+- 使用 `html_renderer.get_renderer()` 获取模板渲染器
+- 使用 `DEFAULT_TEMPLATES` 中的模板文件名
+- 通过 `context` 字典传递模板变量（如 `直辖市名称`、`下级列表`、`页面标题` 等）
 
 **特殊处理**：
 
@@ -132,7 +208,7 @@ python3 generate_all.py
 - 路径只有三层（市 -> 区 -> 街道）
 - 导航链接不包含省份层级（因为直辖市本身就是省级）
 
-### 4. `generate_provinces.py` - 处理普通省份
+### 6. `generate_provinces.py` - 处理普通省份
 
 **功能**：
 
@@ -142,18 +218,24 @@ python3 generate_all.py
 
 **核心函数**：
 
-- `generate_province_html()`: 生成省级别 HTML
-- `generate_city_html()`: 生成市级别 HTML
-- `generate_district_html()`: 生成区级别 HTML（普通省份专用）
-- `generate_street_html()`: 生成街道级别 HTML（普通省份专用）
+- `generate_province_html()`: 生成省级别 HTML（使用模板渲染）
+- `generate_city_html()`: 生成市级别 HTML（使用模板渲染）
+- `generate_district_html()`: 生成区级别 HTML（普通省份专用，使用模板渲染）
+- `generate_street_html()`: 生成街道级别 HTML（普通省份专用，使用模板渲染）
 - `process_province()`: 处理普通省份逻辑
+
+**模板使用**：
+
+- 使用 `html_renderer.get_renderer()` 获取模板渲染器
+- 使用 `DEFAULT_TEMPLATES` 中的模板文件名
+- 通过 `context` 字典传递模板变量（如 `省份名称`、`城市名称`、`下级列表`、`页面标题` 等）
 
 **特殊处理**：
 
 - 路径有四层（省 -> 市 -> 区 -> 街道）
 - 导航链接包含完整的层级关系（区、市、省）
 
-### 5. `generate_hk_mo_tw.py` - 处理港澳台
+### 7. `generate_hk_mo_tw.py` - 处理港澳台
 
 **功能**：
 
@@ -163,20 +245,26 @@ python3 generate_all.py
 
 **核心函数**：
 
-- `generate_municipality_html()`: 生成特别行政区级别 HTML
-- `generate_region_html()`: 生成区域级别 HTML（香港/澳门）
-- `generate_district_only_html()`: 生成区级别 HTML（没有街道层级）
-- `generate_province_html()`: 生成省级别 HTML（台湾）
-- `generate_taiwan_city_html()`: 生成台湾城市级别 HTML
+- `generate_municipality_html()`: 生成特别行政区级别 HTML（使用模板渲染）
+- `generate_region_html()`: 生成区域级别 HTML（香港/澳门，使用模板渲染）
+- `generate_district_only_html()`: 生成区级别 HTML（没有街道层级，使用模板渲染）
+- `generate_province_html()`: 生成省级别 HTML（台湾，使用模板渲染）
+- `generate_taiwan_city_html()`: 生成台湾城市级别 HTML（使用模板渲染）
 - `process_hong_kong_macao()`: 处理香港/澳门逻辑
 - `process_taiwan()`: 处理台湾逻辑
+
+**模板使用**：
+
+- 使用 `html_renderer.get_renderer()` 获取模板渲染器
+- 使用 `DEFAULT_TEMPLATES` 中的模板文件名
+- 通过 `context` 字典传递模板变量
 
 **特殊处理**：
 
 - 香港/澳门：三层结构（特别行政区 -> 区域 -> 区），没有街道层级
 - 台湾：三层结构（省 -> 市/县 -> 区），没有街道层级
 
-### 6. `generate_root_index.py` - 生成根目录首页
+### 8. `generate_root_index.py` - 生成根目录首页
 
 **功能**：
 
@@ -203,7 +291,21 @@ REGIONS = {
 **核心函数**：
 
 - `classify_provinces()`: 将省份按地区分类
-- `generate_root_html()`: 生成根目录 HTML
+- `generate_region_nav_list()`: 生成地区导航列表 HTML（参考 yisu.com/city/ 的格式）
+- `generate_root_html()`: 生成根目录 HTML（使用模板渲染）
+
+**特殊功能**：
+
+- 根页面包含 Banner 轮播（通过 `generate_banner_html()` 生成）
+- 根页面包含产品信息（通过 `get_product_context(include_products=True)` 获取）
+- 根页面使用特殊的 SEO 信息（使用"全国"前缀）
+- 地区导航列表使用 `<dl>` 结构，显示省份和下级城市/区县的链接
+- 使用名称简化函数（`simplify_city_name()`、`simplify_province_name()` 等）优化显示
+
+**模板使用**：
+
+- 使用 `body_root_template.html` 作为内容模板
+- 通过 `context` 字典传递 `地区导航列表`、`banner`、产品信息、SEO 信息等变量
 
 ## 数据流程
 
@@ -288,14 +390,48 @@ def to_pinyin(text: str) -> str:
 
 ### 4. HTML 生成
 
-当前实现方式：**直接通过字符串拼接生成 HTML**（不使用模板系统）
+**当前实现方式**：**使用 Jinja2 模板引擎生成 HTML**
 
-HTML 结构包含：
+**模板系统架构**：
+
+- **三部分模板结构**：
+  - `head_template.html`：页面头部（包含 `<!DOCTYPE>`、`<html>`、`<head>`、`<body>` 开始标签和 header 内容）
+  - `body_*_template.html`：页面主体内容（根据页面类型选择不同的 body 模板）
+  - `foot_template.html`：页面底部（包含 footer 和 `</body></html>` 结束标签）
+
+- **模板渲染流程**：
+  1. 准备模板变量（`context` 字典）
+  2. 使用 `HTMLRenderer.render_html()` 方法渲染三个模板
+  3. 自动组合生成完整 HTML
+
+**模板变量**：
+
+所有模板通过 `context` 字典接收变量，主要包括：
+- **通用变量**：
+  - `当前页面URL地址`：页面 URL（从 `config.DEFAULT_PAGE_URL` 获取）
+  - `main_site_footer`：网站底部内容（从 `config.DEFAULT_FOOTER` 获取）
+- **SEO 变量**（通过 `get_seo_context()` 生成）：
+  - `页面标题`：页面 `<title>` 标签内容
+  - `页面关键词`：页面 `<meta name="keywords">` 内容
+  - `页面描述`：页面 `<meta name="description">` 内容
+- **内容变量**：
+  - `省份名称`、`城市名称`、`区县名称`、`街道名称`：当前页面显示的名称
+  - `下级列表`：下级行政区划的 HTML 列表（`<li><a>` 结构）
+  - `城市导航列表`：城市导航链接（用于复杂模板，使用 `|` 分隔）
+  - `省份链接`、`城市链接`、`区县链接`：导航链接 HTML
+- **特殊变量**（根页面）：
+  - `banner`：Banner 轮播 HTML（通过 `generate_banner_html()` 生成）
+  - `地区导航列表`：按地区分类的导航列表 HTML
+  - 产品信息变量：`产品名称1`、`地区信息1`、`规格1` 等（通过 `get_product_context()` 生成）
+
+**HTML 结构**：
+
 - 标准的 HTML5 文档结构
-- `<head>` 部分：meta 标签、title
+- `<head>` 部分：meta 标签、title、SEO 信息
 - `<body>` 部分：根据层级显示相应内容
   - 列表页面：显示下级行政区划列表
   - 详情页面：显示导航链接和基本信息
+  - 根页面：显示 Banner、地区导航列表、产品信息
 
 ## 特殊处理逻辑
 
@@ -509,49 +645,47 @@ python3 generate_hk_mo_tw.py
 
 ## 已知问题和限制
 
-### 1. 模板系统未使用
-
-- **问题**：代码中完全没有使用 `templates/` 目录下的模板文件
-- **影响**：HTML 结构硬编码在代码中，难以维护和修改样式
-- **建议**：实现模板系统（使用 Jinja2 等模板引擎）
-
-### 2. 代码重复
-
-- **问题**：多个脚本中有重复的 HTML 生成函数
-- **影响**：维护成本高，容易遗漏更新
-- **建议**：统一 HTML 生成逻辑到公共模块
-
-### 3. 性能优化空间
+### 1. 性能优化空间
 
 - **问题**：拼音转换可能被重复计算
 - **影响**：处理大量数据时性能下降
 - **建议**：添加缓存机制（使用 `@lru_cache`）
 
-### 4. 错误处理不完善
+### 2. 错误处理不完善
 
 - **问题**：错误处理比较简单，缺少详细日志
 - **影响**：调试困难，难以追踪问题
 - **建议**：使用 `logging` 模块，添加详细的错误日志
 
+### 3. 模板变量命名
+
+- **问题**：模板变量使用中文命名（如 `省份名称`、`城市名称`），虽然直观但不符合常见规范
+- **影响**：可能影响代码可读性（对于不熟悉中文的开发者）
+- **建议**：考虑使用英文命名（如 `province_name`、`city_name`），但需要同步更新所有模板文件
+
 ## 扩展建议
 
 ### 短期优化
 
-1. **实现模板系统**：使用 Jinja2 模板引擎，提高可维护性
-2. **消除代码重复**：统一 HTML 生成逻辑
-3. **添加拼音转换缓存**：提升性能
+1. **添加拼音转换缓存**：使用 `@lru_cache` 装饰器缓存拼音转换结果，提升性能
+2. **完善错误处理和日志**：使用 `logging` 模块，区分不同级别的日志（INFO、WARNING、ERROR）
+3. **添加数据验证**：确保数据完整性，对缺失数据提供更友好的错误提示
 
 ### 中期优化
 
-1. **完善错误处理和日志**：使用 `logging` 模块
-2. **优化配置管理**：创建 `config.py` 统一配置
-3. **添加数据验证**：确保数据完整性
+1. **模板变量命名规范化**：考虑将中文变量名改为英文（需要同步更新所有模板）
+2. **支持模板继承**：使用 Jinja2 的模板继承功能，减少模板代码重复
+3. **添加单元测试**：为关键函数添加单元测试，确保代码质量
+4. **支持增量更新**：只更新修改过的页面，提升生成速度
 
 ### 长期优化
 
-1. **架构重构**：按功能模块重新组织代码
-2. **性能优化**：支持批量处理和并发
-3. **功能扩展**：支持增量更新、统计报告等
+1. **性能优化**：支持批量处理和并发生成
+2. **功能扩展**：
+   - 支持统计报告（生成页面数量、文件大小等）
+   - 支持自定义模板主题
+   - 支持多语言（国际化）
+3. **架构优化**：按功能模块重新组织代码，提高可维护性
 
 ## 开发注意事项
 
@@ -567,8 +701,103 @@ python3 generate_hk_mo_tw.py
 - `requirements_v2.md`: 需求文档 v2.0（包含模板系统需求）
 - `README_SCRIPTS.md`: 脚本使用说明
 
+## SEO 功能说明
+
+### SEO 信息自动生成
+
+系统会根据页面类型和地区信息自动生成 SEO 信息（页面标题、关键词、描述）。
+
+**生成规则**：
+
+- **根页面**：使用"全国"作为地区前缀
+  - 标题：`全国IDC服务器托管,全国BGP带宽,... - 亿人互联`
+  - 关键词：`全国IDC服务器托管,全国BGP带宽,...`
+  - 描述：`亿人互联全国客户服务中心，提供全国IDC服务器托管、全国BGP带宽等服务...`
+
+- **省份/直辖市页面**：使用省份/直辖市名称作为前缀
+  - 标题：`{省份名称}IDC服务器托管,{省份名称}BGP带宽,... - 亿人互联`
+  - 关键词：`{省份名称}IDC服务器托管,{省份名称}BGP带宽,...`
+  - 描述：`亿人互联{省份名称}地区，提供{省份名称}IDC服务器托管、{省份名称}BGP带宽等服务...`
+
+- **城市/区县/街道页面**：使用对应名称作为前缀，生成规则类似
+
+**配置位置**：
+
+- SEO 相关配置在 `config.py` 中
+- `BASE_SERVICE_KEYWORDS`：基础服务关键词列表
+- `get_seo_context()`：根据页面类型生成 SEO 信息的函数
+
+## 产品信息功能说明
+
+### 产品信息显示
+
+根页面（`output/index.html`）会显示产品信息，其他页面不显示。
+
+**配置位置**：
+
+- 产品信息配置在 `config.py` 中
+- `ROOT_PAGE_PRODUCTS`：根页面显示的产品信息字典
+- `get_product_context()`：获取产品信息上下文的函数
+
+**产品信息结构**：
+
+每个产品包含以下字段：
+- `产品名称`：产品名称
+- `地区信息`：产品所在地区
+- `规格`：产品规格（如 "1核 4G"）
+- `带宽`：带宽信息（如 "2M"）
+- `独享IP`：IP 数量
+- `优惠价`：优惠价格
+- `原价`：原价
+- `购买链接`：购买链接 URL
+
+## Banner 功能说明
+
+### Banner 轮播
+
+根页面（`output/index.html`）会显示 Banner 轮播。
+
+**配置位置**：
+
+- Banner 配置在 `config.py` 中
+- `BANNER_IMAGE_PATH`：Banner 图片路径（相对于 output 目录）
+- `BANNER_ALT_TEXT`：Banner 图片 alt 文本
+- `BANNER_LINK`：Banner 链接 URL
+- `BANNER_COUNT`：Banner 数量（用于轮播）
+- `generate_banner_html()`：生成 Banner HTML 的函数
+
+**实现方式**：
+
+- 使用同一张图片进行轮播（通过 `BANNER_COUNT` 控制数量）
+- 生成轮播指示器（indicators）
+- 支持 JavaScript 控制轮播切换
+
+## 资源复制功能说明
+
+### 模板资源自动复制
+
+运行 `generate_all.py` 时，会自动将 `templates/` 目录下的资源文件复制到 `output/` 目录。
+
+**复制的资源**：
+
+- **文件夹**（从 `config.FOLDERS_TO_COPY` 读取）：
+  - `assets/`：静态资源（图片、字体等）
+  - `common/`：公共资源
+  - `css/`：样式文件
+  - `js/`：JavaScript 文件
+  - `vender/`：第三方库
+
+- **文件**（从 `config.FILES_TO_COPY` 读取）：
+  - `favicon.ico`：网站图标
+
+**实现方式**：
+
+- `common.py` 中的 `copy_template_assets()` 函数负责复制
+- 如果目标文件夹已存在，会先删除再复制（确保资源最新）
+- 复制过程会输出日志信息
+
 ---
 
-**文档版本**: v1.0  
-**最后更新**: 2025年12月27日
+**文档版本**: v1.1  
+**最后更新**: 2025年12月27日（基于实际代码实现更新）  
 **维护者**: Jarod Sun
