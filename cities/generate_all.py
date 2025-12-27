@@ -18,17 +18,10 @@ import subprocess
 from pathlib import Path
 
 from common import copy_template_assets
+from config import BASE_DIR, GENERATION_SCRIPTS
 
-# 配置
-BASE_DIR = Path(__file__).parent
-
-# 脚本列表（按执行顺序）
-SCRIPTS = [
-    "generate_root_index.py",
-    "generate_municipalities.py",
-    # "generate_provinces.py",
-    # "generate_hk_mo_tw.py",
-]
+# 脚本列表（按执行顺序，从配置中读取）
+SCRIPTS = GENERATION_SCRIPTS
 
 
 def run_script(script_name: str) -> bool:

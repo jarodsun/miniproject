@@ -14,13 +14,15 @@ from pathlib import Path
 from typing import Dict, List, Any, Tuple
 
 from common import (
-    BASE_DIR, OUTPUT_DIR, HONG_KONG, MACAO, TAIWAN,
+    HONG_KONG, MACAO, TAIWAN,
     to_pinyin, write_html_file
 )
 from html_renderer import get_renderer
-
-
-HK_MO_TW_FILE = BASE_DIR / "data" / "HK-MO-TW.json"
+from config import (
+    HK_MO_TW_FILE, OUTPUT_DIR,
+    TITLE_TEMPLATES, DEFAULT_PAGE_URL, DEFAULT_FOOTER,
+    get_product_context, DEFAULT_TEMPLATES
+)
 
 
 def generate_municipality_html(municipality_name: str, districts: List[Tuple[str, str]]) -> str:
@@ -41,46 +43,29 @@ def generate_municipality_html(municipality_name: str, districts: List[Tuple[str
         for district_name, district_pinyin in districts
     ])
     
+    # 获取产品信息上下文（非根页面，不包含产品信息）
+    product_context = get_product_context(include_products=False)
+    
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["municipality"].format(municipality_name=municipality_name)
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{municipality_name} - 行政区划",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "直辖市名称": municipality_name,
         "下级列表": district_list_html,
         "城市导航列表": city_nav_list_html,
         "banner": "",
-        # 产品区块变量（如果需要，可以后续添加）
-        "产品名称1": "",
-        "地区信息1": "",
-        "规格1": "",
-        "带宽1": "",
-        "独享IP1": "",
-        "优惠价1": "",
-        "原价1": "",
-        "购买链接1": "",
-        "产品名称2": "",
-        "地区信息2": "",
-        "规格2": "",
-        "带宽2": "",
-        "独享IP2": "",
-        "优惠价2": "",
-        "原价2": "",
-        "购买链接2": "",
-        "产品名称3": "",
-        "地区信息3": "",
-        "规格3": "",
-        "带宽3": "",
-        "独享IP3": "",
-        "优惠价3": "",
-        "原价3": "",
-        "购买链接3": "",
+        # 产品区块变量（从配置中获取）
+        **product_context,
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_municipality_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_municipality"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -99,11 +84,17 @@ def generate_region_html(region_name: str, province_name: str, districts: List[T
         for district_name, district_pinyin in districts
     ])
     
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["region"].format(
+        region_name=region_name,
+        province_name=province_name
+    )
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{region_name} - {province_name}",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "区县名称": region_name,
         "城市名称": region_name,
         "省份名称": province_name,
@@ -113,9 +104,9 @@ def generate_region_html(region_name: str, province_name: str, districts: List[T
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_district_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_district"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -146,11 +137,18 @@ def generate_district_only_html(
     else:
         province_link_html = f'        <p>{nav_label}：<a href="{back_path}index.html">{region_name}</a></p>\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
     
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["taiwan_district"].format(
+        district_name=district_name,
+        region_name=region_name,
+        province_name=province_name
+    )
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{district_name} - {region_name} - {province_name}",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "区县名称": district_name,
         "城市名称": region_name,
         "省份名称": province_name,
@@ -160,9 +158,9 @@ def generate_district_only_html(
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_district_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_district"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -180,19 +178,22 @@ def generate_province_html(province_name: str, cities: List[Tuple[str, str]]) ->
         for city_name, city_pinyin in cities
     ])
     
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["province"].format(province_name=province_name)
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{province_name} - 行政区划",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "省份名称": province_name,
         "下级列表": city_list_html,
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_province_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_province"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -215,11 +216,17 @@ def generate_taiwan_city_html(
         for district_name, district_pinyin in districts
     ])
     
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["taiwan_city"].format(
+        city_name=city_name,
+        province_name=province_name
+    )
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{city_name} - {province_name}",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "城市名称": city_name,
         "省份名称": province_name,
         "省份链接": "../index.html",
@@ -227,9 +234,9 @@ def generate_taiwan_city_html(
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_city_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_city"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html

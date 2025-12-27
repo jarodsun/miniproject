@@ -16,17 +16,11 @@ except ImportError:
     print("错误: pypinyin 未安装，请运行: pip install pypinyin")
     exit(1)
 
-# 配置
-BASE_DIR = Path(__file__).parent
-OUTPUT_DIR = BASE_DIR / "output"
-
-# 四个直辖市
-MUNICIPALITIES = ["北京市", "天津市", "上海市", "重庆市"]
-
-# 港澳台
-HONG_KONG = "香港特别行政区"
-MACAO = "澳门特别行政区"
-TAIWAN = "台湾省"
+# 从配置模块导入配置
+from config import (
+    BASE_DIR, OUTPUT_DIR, MUNICIPALITIES, HONG_KONG, MACAO, TAIWAN,
+    TEMPLATE_DIR, FOLDERS_TO_COPY, FILES_TO_COPY
+)
 
 
 def to_pinyin(text: str) -> str:
@@ -56,30 +50,15 @@ def copy_template_assets():
     """
     将 templates 目录下的素材文件夹复制到 output 目录
     
-    复制的文件夹包括：
-    - assets/
-    - common/
-    - css/
-    - js/
-    - vender/
-    - favicon.ico
+    复制的文件夹和文件列表从 config.py 中读取
     """
-    TEMPLATE_DIR = BASE_DIR / "templates"
-    OUTPUT_DIR = BASE_DIR / "output"
-    
-    # 需要复制的文件夹列表
-    folders_to_copy = ["assets", "common", "css", "js", "vender"]
-    
-    # 需要复制的文件列表
-    files_to_copy = ["favicon.ico"]
-    
     # 确保输出目录存在
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     
     print("正在复制模板资源文件...")
     
     # 复制文件夹
-    for folder_name in folders_to_copy:
+    for folder_name in FOLDERS_TO_COPY:
         src_folder = TEMPLATE_DIR / folder_name
         dst_folder = OUTPUT_DIR / folder_name
         
@@ -95,7 +74,7 @@ def copy_template_assets():
             print(f"  ⚠ 警告: 源文件夹不存在: {src_folder}")
     
     # 复制文件
-    for file_name in files_to_copy:
+    for file_name in FILES_TO_COPY:
         src_file = TEMPLATE_DIR / file_name
         dst_file = OUTPUT_DIR / file_name
         

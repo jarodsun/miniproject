@@ -13,13 +13,15 @@ from pathlib import Path
 from typing import Dict, List, Any, Tuple
 
 from common import (
-    BASE_DIR, OUTPUT_DIR, MUNICIPALITIES,
+    MUNICIPALITIES,
     to_pinyin, write_html_file
 )
 from html_renderer import get_renderer
-
-
-DATA_FILE = BASE_DIR / "data" / "pcas.json"
+from config import (
+    DATA_FILE, OUTPUT_DIR,
+    TITLE_TEMPLATES, DEFAULT_PAGE_URL, DEFAULT_FOOTER,
+    get_product_context, DEFAULT_TEMPLATES, MUNICIPALITY_DISTRICTS_KEY
+)
 
 
 def generate_municipality_html(municipality_name: str, districts: List[Tuple[str, str]]) -> str:
@@ -40,46 +42,29 @@ def generate_municipality_html(municipality_name: str, districts: List[Tuple[str
         for district_name, district_pinyin in districts
     ])
     
+    # 获取产品信息上下文（非根页面，不包含产品信息）
+    product_context = get_product_context(include_products=False)
+    
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["municipality"].format(municipality_name=municipality_name)
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{municipality_name} - 行政区划",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "直辖市名称": municipality_name,
         "下级列表": district_list_html,
         "城市导航列表": city_nav_list_html,
         "banner": "",
-        # 产品区块变量（如果需要，可以后续添加）
-        "产品名称1": "",
-        "地区信息1": "",
-        "规格1": "",
-        "带宽1": "",
-        "独享IP1": "",
-        "优惠价1": "",
-        "原价1": "",
-        "购买链接1": "",
-        "产品名称2": "",
-        "地区信息2": "",
-        "规格2": "",
-        "带宽2": "",
-        "独享IP2": "",
-        "优惠价2": "",
-        "原价2": "",
-        "购买链接2": "",
-        "产品名称3": "",
-        "地区信息3": "",
-        "规格3": "",
-        "带宽3": "",
-        "独享IP3": "",
-        "优惠价3": "",
-        "原价3": "",
-        "购买链接3": "",
+        # 产品区块变量（从配置中获取）
+        **product_context,
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_municipality_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_municipality"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -109,11 +94,14 @@ def generate_district_html(
     # 生成导航链接（直辖市只有城市链接，没有省份链接）
     province_link_html = f'        <p>所属城市：<a href="{back_path}index.html">{city_name}</a></p>'
     
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["district"].format(district_name=district_name, city_name=city_name)
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{district_name} - {city_name}",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "区县名称": district_name,
         "城市名称": city_name,
         "省份名称": province_name,
@@ -123,9 +111,9 @@ def generate_district_html(
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_district_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_district"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -146,11 +134,18 @@ def generate_street_html(
     province_name: 省份名称（直辖市名称）
     back_path: 返回上级的路径（用于生成相对链接）
     """
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["street"].format(
+        street_name=street_name,
+        district_name=district_name,
+        city_name=city_name
+    )
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{street_name} - {district_name} - {city_name}",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "街道名称": street_name,
         "区县名称": district_name,
         "城市名称": city_name,
@@ -161,9 +156,9 @@ def generate_street_html(
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_street_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_street"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -177,7 +172,7 @@ def process_municipality(province_name: str, province_data: Dict[str, Any]):
     province_dir = OUTPUT_DIR / province_pinyin
     
     # 跳过"市辖区"层，直接获取区县数据
-    shixiaqu_data = province_data.get("市辖区", {})
+    shixiaqu_data = province_data.get(MUNICIPALITY_DISTRICTS_KEY, {})
     if not shixiaqu_data:
         print(f"警告: {province_name} 没有找到市辖区数据")
         return

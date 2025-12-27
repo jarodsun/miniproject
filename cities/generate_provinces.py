@@ -13,13 +13,15 @@ from pathlib import Path
 from typing import Dict, List, Any, Tuple
 
 from common import (
-    BASE_DIR, OUTPUT_DIR, MUNICIPALITIES,
+    MUNICIPALITIES,
     to_pinyin, write_html_file
 )
 from html_renderer import get_renderer
-
-
-DATA_FILE = BASE_DIR / "data" / "pcas.json"
+from config import (
+    DATA_FILE, OUTPUT_DIR,
+    TITLE_TEMPLATES, DEFAULT_PAGE_URL, DEFAULT_FOOTER,
+    DEFAULT_TEMPLATES
+)
 
 
 def generate_province_html(province_name: str, cities: List[Tuple[str, str]]) -> str:
@@ -34,19 +36,22 @@ def generate_province_html(province_name: str, cities: List[Tuple[str, str]]) ->
         for city_name, city_pinyin in cities
     ])
     
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["province"].format(province_name=province_name)
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{province_name} - 行政区划",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "省份名称": province_name,
         "下级列表": city_list_html,
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_province_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_province"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -71,11 +76,17 @@ def generate_city_html(
         for district_name, district_pinyin in districts
     ])
     
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["city"].format(
+        city_name=city_name,
+        province_name=province_name
+    )
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{city_name} - {province_name}",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "城市名称": city_name,
         "省份名称": province_name,
         "省份链接": "../index.html",
@@ -83,9 +94,9 @@ def generate_city_html(
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_city_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_city"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -115,11 +126,17 @@ def generate_district_html(
     # 生成省份链接 HTML（普通省份有城市和省份链接）
     province_link_html = f'        <p>所属城市：<a href="{back_path}index.html">{city_name}</a></p>\n        <p>所属省份：<a href="{back_path}../index.html">{province_name}</a></p>'
     
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["district"].format(
+        district_name=district_name,
+        city_name=city_name
+    )
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{district_name} - {city_name}",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "区县名称": district_name,
         "城市名称": city_name,
         "省份名称": province_name,
@@ -129,9 +146,9 @@ def generate_district_html(
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_district_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_district"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html
@@ -152,11 +169,18 @@ def generate_street_html(
     province_name: 省份名称
     back_path: 返回上级的路径（用于生成相对链接）
     """
+    # 生成页面标题
+    page_title = TITLE_TEMPLATES["street"].format(
+        street_name=street_name,
+        district_name=district_name,
+        city_name=city_name
+    )
+    
     renderer = get_renderer()
     context = {
-        "页面标题": f"{street_name} - {district_name} - {city_name}",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": page_title,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "街道名称": street_name,
         "区县名称": district_name,
         "城市名称": city_name,
@@ -167,9 +191,9 @@ def generate_street_html(
     }
     
     html = renderer.render_html(
-        head_template="head_template.html",
-        body_template="body_street_template.html",
-        foot_template="foot_template.html",
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_street"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
     return html

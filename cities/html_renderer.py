@@ -17,7 +17,7 @@ except ImportError:
     print("错误: jinja2 未安装，请运行: pip install jinja2")
     exit(1)
 
-from common import BASE_DIR
+from config import TEMPLATE_DIR, DEFAULT_TITLE
 
 
 class HTMLRenderer:
@@ -32,10 +32,10 @@ class HTMLRenderer:
         初始化模板渲染器
         
         Args:
-            template_dir: 模板文件目录，默认为 BASE_DIR / "templates"
+            template_dir: 模板文件目录，默认为配置中的 TEMPLATE_DIR
         """
         if template_dir is None:
-            template_dir = BASE_DIR / "templates"
+            template_dir = TEMPLATE_DIR
         
         self.template_dir = Path(template_dir)
         if not self.template_dir.exists():
@@ -48,6 +48,9 @@ class HTMLRenderer:
             trim_blocks=True,  # 去除块前后的空白
             lstrip_blocks=True  # 去除行首的空白
         )
+        
+        # 将默认标题添加到全局模板变量中
+        self.env.globals['DEFAULT_TITLE'] = DEFAULT_TITLE
     
     def render_html(
         self,

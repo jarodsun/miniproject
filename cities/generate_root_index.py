@@ -13,40 +13,18 @@ from pathlib import Path
 from typing import List, Tuple, Dict, Any
 
 from common import (
-    BASE_DIR, OUTPUT_DIR, MUNICIPALITIES, HONG_KONG, MACAO, TAIWAN,
+    MUNICIPALITIES, HONG_KONG, MACAO, TAIWAN,
     to_pinyin, write_html_file
 )
 from html_renderer import get_renderer
-
-
-DATA_FILE = BASE_DIR / "data" / "pcas.json"
-HK_MO_TW_FILE = BASE_DIR / "data" / "HK-MO-TW.json"
-
-# 地区分类定义
-REGIONS = {
-    "直辖市": ["北京市", "天津市", "上海市", "重庆市"],
-    "港澳台": ["香港特别行政区", "澳门特别行政区", "台湾省"],
-    "华北地区": ["河北省", "山西省", "内蒙古自治区"],
-    "东北地区": ["辽宁省", "吉林省", "黑龙江省"],
-    "华东地区": ["江苏省", "浙江省", "安徽省", "福建省", "江西省", "山东省"],
-    "华中地区": ["河南省", "湖北省", "湖南省"],
-    "华南地区": ["广东省", "广西壮族自治区", "海南省"],
-    "西南地区": ["四川省", "贵州省", "云南省", "西藏自治区"],
-    "西北地区": ["陕西省", "甘肃省", "青海省", "宁夏回族自治区", "新疆维吾尔自治区"],
-}
-
-# 地区显示顺序
-REGION_ORDER = [
-    "直辖市",
-    "港澳台",
-    "华北地区",
-    "东北地区",
-    "华东地区",
-    "华中地区",
-    "华南地区",
-    "西南地区",
-    "西北地区",
-]
+from config import (
+    DATA_FILE, HK_MO_TW_FILE, OUTPUT_DIR,
+    REGIONS, REGION_ORDER,
+    ROOT_PAGE_TITLE, DEFAULT_PAGE_URL, DEFAULT_FOOTER,
+    generate_banner_html, get_product_context,
+    simplify_city_name, simplify_province_name, simplify_district_name,
+    simplify_special_region_name, MUNICIPALITY_DISTRICTS_KEY
+)
 
 
 def classify_provinces(provinces: List[Tuple[str, str]]) -> dict:
@@ -115,11 +93,11 @@ def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dic
             
             if province_name in MUNICIPALITIES:
                 # 直辖市：直接列出区县
-                shixiaqu_data = province_data.get("市辖区", {})
+                shixiaqu_data = province_data.get(MUNICIPALITY_DISTRICTS_KEY, {})
                 if shixiaqu_data:
                     districts = list(shixiaqu_data.keys())
                     district_links = " | ".join([
-                        f'<a href="{province_pinyin}/{to_pinyin(district)}/index.html">{district.replace("区", "").replace("县", "")}</a>'
+                        f'<a href="{province_pinyin}/{to_pinyin(district)}/index.html">{simplify_district_name(district)}</a>'
                         for district in districts
                     ])
                     province_display = province_name.replace("市", "")
@@ -135,7 +113,7 @@ def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dic
                     f'<a href="{province_pinyin}/{to_pinyin(region)}/index.html">{region}</a>'
                     for region in regions
                 ])
-                province_display = province_name.replace("特别行政区", "")
+                province_display = simplify_special_region_name(province_name)
                 region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{region_links}</dd>')
             
             elif province_name == TAIWAN:
@@ -145,7 +123,7 @@ def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dic
                     f'<a href="{province_pinyin}/{to_pinyin(city)}/index.html">{city}</a>'
                     for city in cities
                 ])
-                province_display = province_name.replace("省", "")
+                province_display = simplify_province_name(province_name)
                 region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{city_links}</dd>')
             
             else:
@@ -153,11 +131,11 @@ def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dic
                 cities = list(province_data.keys())
                 # 简化城市名称显示（移除常见的后缀）
                 city_links = " | ".join([
-                    f'<a href="{province_pinyin}/{to_pinyin(city)}/index.html">{city.replace("市", "").replace("地区", "").replace("自治州", "").replace("盟", "").replace("县", "")}</a>'
+                    f'<a href="{province_pinyin}/{to_pinyin(city)}/index.html">{simplify_city_name(city)}</a>'
                     for city in cities
                 ])
                 # 简化省份名称显示
-                province_display = province_name.replace("省", "").replace("自治区", "").replace("壮族自治区", "").replace("维吾尔自治区", "").replace("回族自治区", "")
+                province_display = simplify_province_name(province_name)
                 region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{city_links}</dd>')
         
         # 组合该地区的导航（使用 <ul><li> 结构，参考页面格式）
@@ -180,58 +158,21 @@ def generate_root_html(all_data: Dict[str, Any], classified_provinces: dict) -> 
     # 生成地区导航列表
     region_nav_list = generate_region_nav_list(all_data, classified_provinces)
     
-    # 生成 Banner HTML（使用同一张图片进行轮播）
-    banner_html = """
-        <div class="banner-carousel">
-            <div class="banner-item active">
-                <a href="#"><img src="./assets/img/banner1.jpg" alt="活动横幅"></a>
-            </div>
-            <div class="banner-item">
-                <a href="#"><img src="./assets/img/banner1.jpg" alt="活动横幅"></a>
-            </div>
-            <div class="banner-item">
-                <a href="#"><img src="./assets/img/banner1.jpg" alt="活动横幅"></a>
-            </div>
-            <div class="banner-indicators">
-                <span class="indicator active" data-slide="0"></span>
-                <span class="indicator" data-slide="1"></span>
-                <span class="indicator" data-slide="2"></span>
-            </div>
-        </div>
-    """
+    # 生成 Banner HTML（使用配置中的函数）
+    banner_html = generate_banner_html()
+    
+    # 获取产品信息上下文（根页面包含产品信息）
+    product_context = get_product_context(include_products=True)
     
     renderer = get_renderer()
     context = {
-        "页面标题": "中国行政区划 - 总入口",
-        "当前页面URL地址": "",
-        "main_site_footer": "",
+        "页面标题": ROOT_PAGE_TITLE,
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
         "banner": banner_html,
         "地区导航列表": region_nav_list,
-        # 产品区块变量（使用默认值）
-        "产品名称1": "入门型优惠套餐",
-        "地区信息1": "香港二区",
-        "规格1": "1核 4G",
-        "带宽1": "2M",
-        "独享IP1": "1个",
-        "优惠价1": "145",
-        "原价1": "145",
-        "购买链接1": "#",
-        "产品名称2": "独立体验套餐",
-        "地区信息2": "香港二区",
-        "规格2": "4核 12G",
-        "带宽2": "5M",
-        "独享IP2": "1个",
-        "优惠价2": "520",
-        "原价2": "520",
-        "购买链接2": "#",
-        "产品名称3": "畅销独立套餐",
-        "地区信息3": "华中一区",
-        "规格3": "4核 8G",
-        "带宽3": "10M",
-        "独享IP3": "1个",
-        "优惠价3": "398",
-        "原价3": "553",
-        "购买链接3": "#",
+        # 产品区块变量（从配置中获取）
+        **product_context,
     }
     
     html = renderer.render_html(
