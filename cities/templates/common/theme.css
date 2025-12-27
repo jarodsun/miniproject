@@ -1,0 +1,100 @@
+
+h1{ font-size: 40px; font-weight: bold;} h2{ font-size: 38px; } h3{ font-size: 24px;} h4{ font-size: 22px; } h5{ font-size: 18px;}
+.font-theme{
+  color: #FF6739;
+}
+body {
+  background-color:#FFFFFF;
+  color: #090A3A;
+  font-family: PingFang SC;
+  font-weight: 400;
+}
+
+input{
+  outline: none;
+}
+
+.title-desc{
+  color: #656A88;
+  text-align: justify;
+}
+/* 盒子阴影 */
+.box-shadow{
+  background: #FFFFFF;
+  box-shadow: 0px 0px 16px rgba(52,52,52,0.16);
+}
+
+.box-shadow-light{
+  background: #FFFFFF;
+  box-shadow: 0px 0px 8px rgba(52,52,52,0.08);
+}
+
+
+
+
+a{
+  color: #090A3A;
+  cursor: pointer;
+  text-decoration: none;
+}
+a:hover{
+  text-decoration: none;
+  color: #090A3A ;
+}
+
+.link-hover{
+  cursor: pointer;
+}
+
+.link-hover:hover{
+  color: #656A88;
+}
+
+
+
+
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid #fff;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+
+.animated{
+  animation-duration: .5s !important;
+}
+
+
+
+/* 按钮 */
+.btn{
+  padding: 12px 32px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+
+
+
+.btn-primary{
+  color: #fff;
+  background:  #161EDE;
+}
+.btn-primary:hover{
+  background: #090A3A;
+}
+
+.btn-normal{
+  color: #fff;
+  background: #161EDE;
+}
+
+.btn-normal:hover{
+  color: #fff;
+}

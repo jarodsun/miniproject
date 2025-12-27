@@ -1,0 +1,300 @@
+@media screen and (max-width: 800px) {
+
+    .section-system .section-content {
+        gap: 20px 0;
+
+    }
+
+
+    .nav-header {
+        display: none;
+    }
+
+    .footer-content .footer-nav {
+        display: none;
+    }
+
+    .section-about .about-left,
+    .section-about .about-right {
+        min-width: 300px;
+    }
+
+    .section-about .about-left .btn {
+        display: none;
+    }
+
+    .section-system h5::before {
+        display: none;
+    }
+
+    .section-example .carousel-right {
+        display: none;
+    }
+
+    .nav-phone-head {
+        display: flex;
+    }
+
+    .footer-content .footer-collapse {
+        display: block;
+    }
+
+    .footer .footer-record {
+        flex-wrap: wrap;
+        padding: 0;
+    }
+
+
+    .footer .footer-record .footer-beian {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+
+    .nav-tabs li a {
+        width: 130px;
+        padding: 0;
+    }
+
+    .tab-content .tab-pane {
+        padding-left: 5px;
+    }
+
+
+    .section-base .base-img {
+        width: 100%;
+        height: auto;
+        margin-left: 0;
+        margin-top: 20px;
+    }
+
+    .section-use .special-list {
+        grid-template-columns: auto auto;
+    }
+
+    .section-solution .base-item {
+        width: auto;
+        overflow: auto;
+    }
+
+    .section-solution .base-item .layui-table {
+        min-width: 800px;
+    }
+
+    .section-solution .base-item .layui-table {
+        min-width: 800px;
+    }
+
+    .section-tab .layui-tab .layui-tab-content .layui-tab-item .partner-img {
+        width: 320px;
+        margin-top: 20px;
+    }
+
+    .section-partner .partner-panel {
+        width: 320px;
+    }
+
+
+
+    .nav-head-bottom {
+        display: none;
+    }
+
+
+    .record-list-s {
+        overflow: auto;
+    }
+
+    .page .nav-left {
+        padding-top: 0;
+        width: 100%;
+        height: auto;
+    }
+
+    .page .page-content {
+        padding: 0 10px;
+        padding-top: 80px;
+        margin-left: 0;
+    }
+
+    .overview {
+        width: auto;
+        top: 55px;
+        left: 0;
+        padding: 20px;
+    }
+
+    .nav-menu-btn-list {
+        display: none;
+    }
+
+    .nav-menu-btn-phone {
+        display: block;
+    }
+
+    .nav-menu-btn-phone img {
+        transform: rotate(90deg);
+    }
+
+    .nav-menu-btn-phone .chevron-img {
+        transform: rotate(270deg);
+    }
+
+    .search-bg {
+        padding: 20px;
+        margin-top: 60px;
+        display: none;
+        background: #fff;
+    }
+
+    .tree-document-phone {
+        display: none;
+        background: #fff;
+        width: 100%;
+        height: 100vh;
+        margin: 0 !important;
+        padding-left: 12px;
+    }
+
+    .page .nav-left img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .guide-box {
+        display: none;
+    }
+
+    .section-team .team-card {
+        flex-wrap: wrap;
+    }
+
+    .section-about .about-left .title-desc {
+        margin-bottom: 20px;
+    }
+
+    .section-about-cont {
+        gap: 30px;
+    }
+
+    .banner-bussiness {
+        background-image: none;
+        background: linear-gradient(180deg, #FFFFFF 0%, #F0F9FC 100%);
+    }
+
+    .section-custom .special-list {
+        gap: 40px;
+    }
+
+    .section-custom .special-list .special-item {
+        margin-top: 20px;
+    }
+
+    .banner-index {
+        padding-bottom: 0;
+    }
+
+    .banner-none {
+        padding-bottom: 50px;
+    }
+
+    .banner-index .section-content2 {
+        padding-bottom: 110px;
+        background-position: right bottom;
+        background-size: 70%;
+    }
+
+    .bg-about {
+        display: none;
+    }
+
+    .banner-index .banner-about {
+        background-image: url('../assets/img/about/bg.png');
+        background-position: 150% bottom;
+        background-repeat: no-repeat;
+    }
+
+    .section-honor .honor-list-line {
+        display: none;
+    }
+
+    .section-honor .section-title .tips {
+        margin-top: 20px;
+    }
+
+    .section-rich::after {
+        top: 400px;
+    }
+
+    .section-use {
+        padding: 40px 0;
+        background: #090A3A;
+    }
+
+    .banner-solution {
+        background-position: bottom;
+        background-size: contain;
+
+    }
+
+    .footer .register-advert {
+        display: none;
+    }
+
+    .footer .register-advert2 {
+        display: block;
+        background: url('../assets/img/index/register.png') no-repeat;
+        height: 200px;
+        background-size: 100%;
+    }
+
+    .document-list {
+        flex-wrap: nowrap;
+        gap: 5px;
+    }
+
+    .section-advantage .advantage-bg {
+        height: 50px;
+        background-size: 100%;
+    }
+
+    .system-box {
+
+        padding: 20px 10px;
+    }
+
+    .section-introduction {
+        padding: 0;
+    }
+
+    .section-introduction-bg {
+        padding: 80px 0;
+        background: url(../assets/img/about/production.png) no-repeat;
+        background-position: right 95%;
+        background-size: 70%;
+    }
+
+    .section-introduction-bg .section-content {
+        background: none;
+    }
+
+    .section-introduction-bg .desc {
+        display: none;
+    }
+
+    .section-custom .special-list {
+        margin-top: 20px;
+    }
+
+    .overview {
+        width: 100%;
+    }
+
+    .document-details .document-view-item .document-view-cont {
+        gap: 30px;
+    }
+
+    .document-details .document-view-item .document-view-cont a {
+        width: auto;
+    }
+}

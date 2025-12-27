@@ -1,0 +1,253 @@
+/* system */
+.section-system {
+  padding: 120px 0;
+  background: #FFFFFF;
+}
+
+.section-system-customer {
+  background: #EFF9FC;
+}
+
+
+.section-system .section-content {
+  flex-wrap: wrap;
+  gap: 120px;
+}
+
+.section-system-img {
+  flex: 1;
+}
+
+.section-system h5 {
+  margin-bottom: 30px;
+  display: inline-block;
+  position: relative;
+  font-size: 36px;
+}
+
+.section-system h5::before {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: 0px;
+  height: 40px;
+  width: 40px;
+  background-image: url('../assets/img/index/group-1.png');
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.section-system-customer h5::before {
+  background-image: url('../assets/img/index/group-2.png');
+}
+
+.section-system-dcim h5::before {
+  background-image: url('../assets/img/index/group-3.png');
+}
+
+.section-system .section-system-cont {
+  width: 410px;
+}
+
+.section-system .section-system-cont .title-desc {
+  margin-bottom: 40px;
+  font-size: 18px;
+}
+
+.section-system .section-system-cont .section-system-text {
+  color: #656A88;
+  line-height: 40px;
+}
+
+.section-system .section-system-img img {
+  min-width: 300px;
+  flex: 1;
+  box-shadow: 0px 8px 12px 1px rgba(0, 0, 0, 0.08);
+  /* background: url('../assets/img/index/customer.png') no-repeat;
+    background-size: 100%; */
+}
+
+/* .section-system .section-system-img:nth-child(2){
+    background-image: url('../assets/img/index/dcim.png');
+}
+ */
+
+
+/* 产品优势 */
+.section-advantage .advantage-bg {
+  height: 250px;
+  margin-bottom: 60px;
+  background: url('../assets/img/index/advantage.png');
+  background-repeat: no-repeat;
+}
+
+.section-advantage .advantage-right {
+  line-height: 40px;
+  font-size: 18px;
+}
+
+.section-advantage .advantage-right .number {
+  font-weight: bold;
+  color: #81E2FF;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+
+.section-advantage .advantage-list {
+  margin-top: 60px;
+  margin-bottom: 120px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+
+
+.section-advantage .advantage-list .advantage-item img {
+  margin-bottom: 20px;
+  height: 54px;
+  width: 54px;
+}
+
+.section-advantage .advantage-list .advantage-item p {
+  margin-top: 10px;
+  width: 260px;
+  color: #656A88;
+}
+
+.section-example {
+  padding: 70px 0 80px;
+  color: #fff;
+  background: #090A3A;
+}
+
+.section-example h2 {
+  margin-bottom: 32px;
+}
+
+.section-example p {
+  margin-bottom: 34px;
+  max-width: 566px;
+  line-height: 32px;
+  text-align: justify;
+}
+
+.section-example .btn {
+  color: #161EDE;
+  background: #FFFFFF;
+  margin-bottom: 70px;
+}
+
+.section-example .btn:hover {
+  color: #fff;
+  background: #161EDE;
+}
+
+.section-example .carousel-right {
+  background: #C1B8F1;
+  width: 538px;
+  height: 273px;
+  margin-top: 45px;
+  margin-bottom: 60px;
+}
+
+.section-example .carousel-right img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#carousel-example,
+#carousel-example>[carousel-item]>* {
+  background: #090A3A;
+
+}
+
+#carousel-example .layui-carousel-ind {
+  top: 20px;
+}
+
+#carousel-example .layui-carousel-ind li {
+  width: 20px;
+  height: 4px;
+  border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+#carousel-example .layui-carousel-ind li.layui-this {
+  background: rgba(129, 226, 255, 1);
+}
+
+/* 公司logo */
+.section-company {
+  padding: 80px 0;
+  /* display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; */
+}
+.section-company .logo-box{
+  overflow: hidden;
+  margin-left: -26px;
+}
+.section-company .company-img {
+  margin: 15px 0;
+  width: 185px;
+  height: 60.85px;
+  float: left;
+  margin-left: 26px;
+}
+.section-company .company-img a{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  box-sizing: border-box;
+}
+.section-company .company-img img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* 关于我们 */
+.section-about {
+  padding: 100px 0 60px 0;
+  background: #EFF9FC;
+}
+
+.section-about-cont {
+  gap: 100px;
+}
+
+.section-about .about-left .title-desc {
+  margin-top: 30px;
+  margin-bottom: 60px;
+  line-height: 30px;
+}
+
+.section-about .about-left,
+.section-about .about-right {
+  min-width: 400px;
+}
+
+.section-about .about-right img {
+  height: 48px;
+  width: 48px;
+  margin-right: 20px;
+}
+
+.com-mark {
+  /*font-family: Arial;*/
+  /*letter-spacing: 4px;*/
+  /*font-size: 24px;*/
+}
+
+
+@media screen and (max-width: 750px) {
+    .section-company .company-img{
+        max-width: 42%;
+    }
+}

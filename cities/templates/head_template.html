@@ -1,65 +1,202 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
-    <!-- 
-    Dynamic header from main site: https://www.idcsmart.com/
-    This city showcase feature is an additional functionality provided for the main site.
-    
-    Implementation options:
-    1. Server-side include (Recommended): Fetch header HTML during page generation
-    2. Client-side fetch: Use JavaScript to load header via server proxy
-    -->
-    
-    <!-- Option 2: Client-side JavaScript (Fallback if server-side not available) -->
-    <!-- This requires a server-side proxy endpoint to avoid CORS issues -->
-    <script>
-        (function() {
-            document.addEventListener('DOMContentLoaded', function() {
-                var headerContainer = document.getElementById('main-site-header-container');
-                if (headerContainer && (!headerContainer.innerHTML.trim() || headerContainer.innerHTML === '{main_site_header}')) {
-                    // Use a server-side proxy endpoint to fetch header
-                    // Example endpoint: /api/proxy-header or /proxy/header
-                    // The proxy should fetch https://www.idcsmart.com/ and extract #header element
-                    fetch('/api/proxy-header')
-                        .then(response => {
-                            if (!response.ok) throw new Error('Proxy request failed');
-                            return response.text();
-                        })
-                        .then(html => {
-                            var parser = new DOMParser();
-                            var doc = parser.parseFromString(html, 'text/html');
-                            var header = doc.querySelector('#header');
-                            if (header) {
-                                headerContainer.innerHTML = header.outerHTML;
-                                // Also try to load header-related CSS if needed
-                                var headerStyles = doc.querySelectorAll('head link[rel="stylesheet"]');
-                                headerStyles.forEach(function(link) {
-                                    var existingLink = document.querySelector('head link[href="' + link.href + '"]');
-                                    if (!existingLink && link.href) {
-                                        var newLink = document.createElement('link');
-                                        newLink.rel = 'stylesheet';
-                                        newLink.href = link.href;
-                                        document.head.appendChild(newLink);
-                                    }
-                                });
-                            }
-                        })
-                        .catch(function(error) {
-                            console.warn('Failed to load header from main site via proxy:', error);
-                            // Could show a fallback message or leave empty
-                        });
-                }
-            });
-        })();
-    </script>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Language" content="zh-cn">
+
+
+  <script src="./vender/jQuery/jquery-3.5.1.min.js"></script>
+  <link rel="stylesheet" href="./vender/layui/css/layui.css">
+  <script src="./vender/layui/layui.js"></script>
+
+
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="./vender/bootstrap/css/bootstrap.min.css">
+  <script src="./vender/bootstrap/js/bootstrap.min.js"></script>
+
+  <!-- 公共区域 -->
+  <link rel="stylesheet" href="./assets/font/iconfont.css">
+  <link rel="stylesheet" href="./common/reset.css">
+  <link rel="stylesheet" href="./common/style.css">
+  <link rel="stylesheet" href="./common/theme.css">
+  <link rel="stylesheet" href="./common/common.css">
+  <link rel="stylesheet" href="./vender/animate/animate.css">
+  <script src="./common/common.js"></script>
+
+  <!-- 当前页面 -->
+  <script src="./js/index.js"></script>
+  <link rel="stylesheet" href="./css/index.css">
+  <link rel="stylesheet" href="./common/resize.css">
+  <link rel="alternate" hreflang="zh-Hans" href="变量-当前页面URL地址">
+  <link rel="canonical" href="变量-当前页面URL地址">
+  <script type="application/ld+json">
+
+  </script>
+
+  <title>智简魔方idc运维管理系统-全智能IDC机房云服务器管理软件,主机管理系统,DCIM软件定制开发,运维管理软件服务商</title>
 </head>
 <body>
-<!-- Option 1: Server-side include (Recommended for production) -->
-<!-- The header content should be fetched from https://www.idcsmart.com/ and inserted here during HTML generation -->
-<!-- Placeholder variable: {main_site_header} -->
-<div id="main-site-header-container">
-    {main_site_header}
-</div>
+  <header id="header">
+    <link rel="shortcut icon" href="./favicon.ico">
+    <div class="nav-shadow">
+      <div class="section-content nav-header">
+        <div class="nav-left">
+          <div class="nav-icon">
+            <a href="https://www.idcsmart.com/index.html"><img src="./assets/img/index/logo.png" alt=""></a>
+          </div>
+          <ul class="layui-nav " id="top-nav">
+            <li class="layui-nav-item"><a href="https://www.idcsmart.com/index.html">首页</a></li>
+            <li class="layui-nav-item">
+              <a href="javascript:;">产品</a>
+              <dl class="layui-nav-child layui-anim layui-anim-upbit">
+                <dd><a href="https://www.idcsmart.com/business.html">业务管理系统</a></dd>
+                <dd><a href="https://www.idcsmart.com/cloud.html">云平台管理系统</a></dd>
+                <dd><a href="https://www.idcsmart.com/dcim.html">魔方DCIM系统</a></dd>
+              </dl>
+            </li>
+            <li class="layui-nav-item "><a href="https://my.idcsmart.com/shop/" target="_blank">商店</a></li>
+            <li class="layui-nav-item"><a href="https://bbs.idcsmart.com/" target="_blank">论坛</a></li>
+            <li class="layui-nav-item">
+              <a href="javascript:;">服务</a>
+              <dl class="layui-nav-child layui-anim layui-anim-upbit">
+                <dd><a href="https://www.idcsmart.com/solution.html">解决方案</a></dd>
+                <dd><a href="https://www.idcsmart.com/announce.html">服务公告</a></dd>
+                <dd><a href="https://www.idcsmart.com/verifydomain.html">授权查询</a></dd>
+              </dl>
+            </li>
+            <li class="layui-nav-item ">
+              <a href="javascript:;">支持</a>
+              <dl class="layui-nav-child layui-anim layui-anim-upbit">
+                <dd><a href="https://www.idcsmart.com/helps_center.html" target="_blank">帮助中心</a></dd>
+                <dd><a href="https://www.idcsmart.com/wiki_list.html" target="_blank">用户指南</a></dd>
+                <dd><a href="https://www.idcsmart.com/api_list.html" target="_blank">开发文档</a></dd>
+              </dl>
+            </li>
+            <li class="layui-nav-item ">
+              <a href="javascript:;">关于</a>
+              <dl class="layui-nav-child layui-anim layui-anim-upbit">
+                <dd><a href="https://www.idcsmart.com/about.html">关于我们</a></dd>
+                <dd><a href="https://www.idcsmart.com/join.html">加入我们</a></dd>
+                <dd><a href="https://www.idcsmart.com/partner.html">合作伙伴</a></dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+
+        <div class="nav-right">
+          <a href="https://my.idcsmart.com/login.htm" target="_blank" id="com-login" style="display: inline;">
+            <div class="login-btn">登录</div>
+          </a>
+          <a href="https://my.idcsmart.com/home.htm" target="_blank" id="com-control" style="display: none;">
+            <div class="control-btn">控制台</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-phone-head">
+        <div class="nav-icon">
+          <a href="https://www.idcsmart.com/index.html"><img src="./assets/img/index/logo.png" alt=""></a>
+        </div>
+        <div class="nav-phone-right">
+          <div class="icon-box" style="cursor: pointer;">
+            <i class="layui-icon layui-icon-align-center"></i>
+          </div>
+          <a href="https://my.idcsmart.com/login.htm" target="_blank" id="phoen-com-login" style="display: inline;">
+            <div class="login-btn">登录</div>
+          </a>
+          <a href="https://my.idcsmart.com/home.htm" target="_blank" id="phoen-com-control" style="display: none;">
+            <div class="control-btn">控制台</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="./vender/layui/layui.js"></script>
+
+    <div class=" layui-nav-phone layui-nav-s">
+      <ul class="layui-nav layui-nav-tree layui-nav-side ">
+        <li class="layui-nav-item "><a href="https://www.idcsmart.com/index.html">首页</a></li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">软件</a>
+          <dl class="layui-nav-child">
+            <dd><a href="https://www.idcsmart.com/business.html">业务管理系统</a></dd>
+            <dd><a href="https://www.idcsmart.com/cloud.html">公有云平台</a></dd>
+            <dd><a href="https://www.idcsmart.com/dcim.html">魔方DCIM系统</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item "><a href="https://my.idcsmart.com/shop/">商店</a></li>
+        <li class="layui-nav-item"><a href="https://bbs.idcsmart.com/" target="_blank">论坛</a></li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">服务</a>
+          <dl class="layui-nav-child">
+            <dd><a href="https://www.idcsmart.com/solution.html">解决方案</a></dd>
+            <dd><a href="https://www.idcsmart.com/announce.html">服务公告</a></dd>
+            <dd><a href="https://www.idcsmart.com/verifydomain.html">授权查询</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item ">
+          <a href="javascript:;">支持</a>
+          <dl class="layui-nav-child">
+            <dd><a href="https://www.idcsmart.com/helps_center.html" target="_blank">帮助中心</a></dd>
+            <dd><a href="https://www.idcsmart.com/wiki_list.html" target="_blank">用户指南</a></dd>
+            <dd><a href="https://www.idcsmart.com/api_list.html" target="_blank">开发文档</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item ">
+          <a href="javascript:;">关于</a>
+          <dl class="layui-nav-child">
+            <dd><a href="https://www.idcsmart.com/about.html">关于我们</a></dd>
+            <dd><a href="https://www.idcsmart.com/join.html">加入我们</a></dd>
+            <dd><a href="https://www.idcsmart.com/partner.html">合作伙伴</a></dd>
+          </dl>
+        </li>
+      </ul>
+      <div class="flex1 mask-header"></div>
+    </div>
+  </header>
+
+  <script>
+    layui.use('element', function(){
+      var element = layui.element;
+    });
+
+    // 移动端菜单切换功能
+    $(function() {
+      // 延迟执行，确保所有元素都已加载
+      setTimeout(function() {
+        // 点击 icon-box 切换菜单
+        $('icon-box').on('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          var $nav = $('.layui-nav-s');
+          var navClass = $nav.attr('class') || '';
+          
+          // 使用 indexOf 检查 class，因为可能有前导空格
+          if (navClass.indexOf('layui-nav-phone') !== -1) {
+            // 如果菜单是隐藏的，显示菜单
+            $nav.removeClass('layui-nav-phone');
+          } else {
+            // 如果菜单是显示的，隐藏菜单
+            $nav.addClass('layui-nav-phone');
+          }
+        });
+        
+        // 点击遮罩层关闭菜单
+        $('.mask-header').on('click', function() {
+          $('.layui-nav-s').addClass('layui-nav-phone');
+        });
+        
+        // 点击菜单外部区域关闭菜单
+        $(document).on('click', function(e) {
+          if (!$(e.target).closest('.icon-box, .layui-nav-s').length) {
+            $('.layui-nav-s').addClass('layui-nav-phone');
+          }
+        });
+      }, 300);
+    });
+  </script>
+</body>
+</html>
