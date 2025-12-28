@@ -3327,3 +3327,423 @@ h6 {
   color: #FF6666;
   background-color: #F0F2F5;
 }
+/* ========== 移动端响应式样式和导航栏修复 ========== */
+/* 修复导航栏遮挡内容的问题 */
+/* 确保导航栏固定在顶部 */
+.homepage-topbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 1200 !important;
+  background-color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分导航栏和内容 */
+}
+
+/* 为 main-wrap 添加足够的顶部间距 */
+.main-wrap {
+  padding-top: 80px !important;
+  margin-top: 0 !important;
+  position: relative;
+}
+
+/* 确保 body 没有额外的 margin/padding */
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 确保页面从顶部开始 */
+html {
+  margin: 0;
+  padding: 0;
+}
+
+/* 平板和手机 (max-width: 768px) */
+@media (max-width: 768px) {
+  /* 基础布局调整 */
+  body {
+    min-width: auto !important;
+  }
+  
+  .main-wrap {
+    width: 100% !important;
+    max-width: 100%;
+    padding: 56px 15px 40px 15px !important;
+  }
+  
+  .auto-container {
+    width: 100% !important;
+    padding: 0 15px;
+  }
+  
+  /* 导航栏移动端适配 */
+  .homepage-topbar {
+    height: 56px !important;
+    width: 100% !important;
+    min-width: auto !important;
+    max-width: 100% !important;
+  }
+  
+  .homepage-topbar .homepage-topbar-mod {
+    padding: 0;
+    height: 100%;
+    width: 100% !important;
+    min-width: auto !important;
+    max-width: 100% !important;
+  }
+  
+  .homepage-topbar .homepage-topbar-top {
+    height: 56px !important;
+    padding-left: 15px;
+    padding-right: 15px;
+    position: relative;
+    width: 100% !important;
+    min-width: auto !important;
+    max-width: 100% !important;
+  }
+  
+  .homepage-topbar .logo img {
+    max-height: 32px;
+  }
+  
+  /* 隐藏桌面端导航菜单，显示汉堡菜单 */
+  .homepage-topbar .page-list,
+  .homepage-topbar .topbar-dropmenu-container,
+  .homepage-topbar .topbar-logged-in,
+  .homepage-topbar .topbar-user,
+  .homepage-topbar .topbar-hot,
+  .homepage-topbar .language-kind {
+    display: none !important;
+  }
+  
+  /* 确保 homepage-topbar-top 有正确的定位 */
+  .homepage-topbar .homepage-topbar-top {
+    position: relative;
+  }
+  
+  /* 汉堡菜单按钮 */
+  .mobile-menu-toggle {
+    display: block !important;
+    position: fixed !important;
+    right: 15px !important;
+    top: 12px !important;
+    width: 36px !important;
+    height: 36px !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    z-index: 1202 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  
+  .mobile-menu-toggle span {
+    display: block !important;
+    width: 24px !important;
+    height: 3px !important;
+    background: #2D3037 !important;
+    margin: 5px auto !important;
+    transition: all 0.3s;
+    border-radius: 2px;
+    opacity: 1 !important;
+  }
+  
+  .mobile-menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+  }
+  
+  .mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .mobile-menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+  }
+  
+  /* 移动端菜单 */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+    z-index: 1200;
+  }
+  
+  .mobile-menu.active {
+    display: block;
+  }
+  
+  .mobile-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .mobile-menu ul li {
+    border-bottom: 1px solid #F0F2F5;
+  }
+  
+  .mobile-menu ul li a {
+    display: block;
+    padding: 15px 20px;
+    color: #2D3037;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  /* 主内容区域布局 */
+  .main-wrap .content {
+    flex-direction: column !important;
+  }
+  
+  .main-wrap .content .content-wrap {
+    width: 100% !important;
+  }
+  
+  /* 轮播图 */
+  .main-wrap .content .content-wrap .swiper-container {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 125px;
+  }
+  
+  .main-wrap .content .content-wrap .swiper-container img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  /* 产品列表卡片 */
+  .main-wrap .content .content-wrap .list-box .item-wrap ul {
+    flex-direction: column !important;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .item-wrap ul li {
+    width: 100% !important;
+    margin-bottom: 20px;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .item-wrap ul li .menu {
+    width: 100%;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .item-wrap ul li .buynow {
+    width: 100% !important;
+    min-height: 44px;
+    font-size: 16px;
+  }
+  
+  /* 侧边栏 - 可折叠 */
+  .main-wrap .content .sidebar {
+    width: 100% !important;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid #DBE1E8;
+  }
+  
+  .sidebar-toggle {
+    display: block !important;
+    width: 100%;
+    padding: 12px 15px;
+    background: #F04436;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    min-height: 44px;
+  }
+  
+  .sidebar-content {
+    display: none !important;
+  }
+  
+  .sidebar-content.active {
+    display: block !important;
+  }
+  
+  .sidebar-nav-list ul li {
+    padding: 12px 15px;
+    font-size: 14px !important;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* 地区列表优化 */
+  .address-list {
+    font-size: 14px;
+  }
+  
+  .address-item-left {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .address-item-right {
+    margin-bottom: 15px;
+  }
+  
+  .address-item-right dt a,
+  .address-item-right dd a {
+    min-height: 32px;
+  }
+  
+  /* 页脚优化 */
+  .footer {
+    padding: 30px 15px;
+  }
+  
+  .footer .other-link {
+    flex-direction: column;
+    padding-bottom:0 !important;
+  }
+  
+  .footer .link-look {
+    flex-direction: column;
+    padding-bottom:0 !important;
+  }
+  
+  .footer .link-list {
+    width: 100% !important;
+    margin-bottom: 20px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* Footer链接列表横向排列 */
+  .footer .link-list ul {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    flex-direction: row !important;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .footer .link-list ul li {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 8px;
+    white-space: nowrap;
+  }
+  
+  .footer .link-list ul li:after {
+    margin-left: 15px;
+    color: #9EA7B3;
+  }
+  
+  .footer .link-list ul li:last-child:after {
+    content: '';
+  }
+  
+  .footer-bottom {
+    padding: 20px 15px;
+    font-size: 12px;
+    line-height: 1.6;
+    height: auto;
+  }
+  
+  .footer-bottom p {
+    margin: 8px 0;
+  }
+  
+  .footer-bottom span {
+    display: block;
+    margin: 4px 0;
+  }
+}
+
+/* 小屏手机 (max-width: 480px) */
+@media (max-width: 480px) {
+  .main-wrap {
+    padding: 56px 10px 30px 10px !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .homepage-topbar .logo img {
+    max-height: 28px;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .title {
+    padding-top: 30px;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .title > h2 {
+    flex-shrink: 0;
+    margin-right: 10px;
+    margin-bottom: 0 !important;
+    padding-left: 20px;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .title > p {
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .title > p a {
+    font-size: 14px;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .title > h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .item-wrap ul li .menu .menu-title {
+    font-size: 18px;
+  }
+  
+  .main-wrap .content .content-wrap .list-box .item-wrap ul li .price-box .reduced span:nth-child(2) {
+    font-size: 20px;
+  }
+  
+  .footer {
+    padding: 20px 10px;
+  }
+  
+  .footer-bottom {
+    padding: 15px 10px;
+    font-size: 11px;
+  }
+}
+
+/* 触摸优化 - 禁用 hover 效果在触摸设备上 */
+@media (hover: none) {
+  .main-wrap .content .content-wrap .list-box .item-wrap ul li:hover {
+    transform: none;
+  }
+}
+
+/* 图片自适应 */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 桌面端默认隐藏移动端元素 */
+.mobile-menu-toggle,
+.mobile-menu,
+.sidebar-toggle {
+  display: none;
+}
+
+/* 桌面端侧边栏默认显示 - 只在非移动端显示 */
+@media (min-width: 769px) {
+  .sidebar-content {
+    display: block !important;
+  }
+}
