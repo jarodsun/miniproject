@@ -54,6 +54,7 @@ cities/__pycache__/
 *.tmp
 *.temp
 .cache/
+temp/
 
 # 系统文件
 Thumbs.db
