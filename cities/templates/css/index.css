@@ -643,26 +643,7 @@
 
 /* 地区导航列表 */
 .city-nav-list {
-    max-height: 800px;
-    overflow-y: auto;
-}
-
-.city-nav-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.city-nav-list::-webkit-scrollbar-track {
-    background: #F5F5F5;
-    border-radius: 3px;
-}
-
-.city-nav-list::-webkit-scrollbar-thumb {
-    background: #D9D9D9;
-    border-radius: 3px;
-}
-
-.city-nav-list::-webkit-scrollbar-thumb:hover {
-    background: #BFBFBF;
+    /* 移除滚动条，让内容完全显示 */
 }
 
 .region-nav-list {
