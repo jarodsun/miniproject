@@ -2733,23 +2733,26 @@ a {
   padding-top: 60px;
 }
 .other-link {
-  max-width: 1440px;
   padding-bottom: 55px;
   margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .other-link > div {
-  float: left;
+  float: none;
 }
 .other-link .yisu-contact {
-  float: right;
+  float: none;
 }
 .link-look {
-  width: 80%;
-  padding-bottom: 45px;
+  justify-content: center;
+  align-items: center;
 }
 .link-list {
   float: left;
-  width: 20%;
+  padding-left: 50px;
+  padding-right: 50px;
 }
 .link-list .link-title {
   line-height: 26px;
