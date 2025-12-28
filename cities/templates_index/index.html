@@ -311,6 +311,33 @@
                 margin-bottom: 20px;
             }
             
+            /* Footer链接列表横向排列 */
+            .footer .link-list ul {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                flex-direction: row !important;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .footer .link-list ul li {
+                display: inline-block;
+                margin-right: 15px;
+                margin-bottom: 8px;
+                white-space: nowrap;
+            }
+            
+            .footer .link-list ul li:after {
+                content: '|';
+                margin-left: 15px;
+                color: #9EA7B3;
+            }
+            
+            .footer .link-list ul li:last-child:after {
+                content: '';
+            }
+            
             .footer-bottom {
                 padding: 20px 15px;
                 font-size: 12px;
