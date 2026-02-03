@@ -21,7 +21,7 @@ from typing import List, Dict, Any
 BASE_DIR = Path(__file__).parent
 OUTPUT_DIR = BASE_DIR / "output"
 DATA_DIR = BASE_DIR / "data"
-TEMPLATE_DIR = BASE_DIR / "templates"
+TEMPLATE_DIR = BASE_DIR / "templates_index"
 
 # 数据文件路径
 DATA_FILE = DATA_DIR / "pcas.json"
@@ -318,44 +318,37 @@ def get_product_context(include_products: bool = False) -> Dict[str, str]:
 
 
 # ==================== Banner配置 ====================
-# Banner图片路径（相对于output目录）
-BANNER_IMAGE_PATH = "./assets/img/banner1.jpg"
-BANNER_ALT_TEXT = "活动横幅"
-BANNER_LINK = "#"
-
-# Banner数量（用于轮播）
-BANNER_COUNT = 3
+# Banner 使用 Swiper 结构，与 templates_index 新样式一致
+# 图片路径、alt、链接（相对于 output 目录）
+BANNER_SLIDES = [
+    {"path": "./images/page/banner1.jpg", "alt": "新人红包免费领", "link": "https://www.yisu.com/coupon/?f=city"},
+    {"path": "./images/page/banner2.jpg", "alt": "免费试用云服务器、云数据库、CDN、短信", "link": "https://www.yisu.com/huodong/enterpriseTrial.html?f=city"},
+    {"path": "./images/page/banner3.jpg", "alt": "亿速云CDN，全国加速没死角", "link": "https://www.yisu.com/cdn/huodong.html?f=city"},
+]
+BANNER_COUNT = len(BANNER_SLIDES)
 
 
 def generate_banner_html() -> str:
     """
-    生成Banner HTML（使用同一张图片进行轮播）
+    生成 Banner HTML（Swiper 轮播结构，与 templates_index 新样式一致）
     
     Returns:
-        Banner HTML字符串
+        Banner HTML 字符串
     """
-    banner_items = []
-    indicators = []
-    
-    for i in range(BANNER_COUNT):
-        active_class = "active" if i == 0 else ""
-        banner_items.append(
-            f'            <div class="banner-item {active_class}">\n'
-            f'                <a href="{BANNER_LINK}"><img src="{BANNER_IMAGE_PATH}" alt="{BANNER_ALT_TEXT}"></a>\n'
-            f'            </div>'
+    slides = []
+    for slide in BANNER_SLIDES:
+        slides.append(
+            f'                    <div class="swiper-slide">\n'
+            f'                        <a href="{slide["link"]}"><img src="{slide["path"]}" alt="{slide["alt"]}"></a>\n'
+            f'                    </div>'
         )
-        indicators.append(
-            f'                <span class="indicator {active_class}" data-slide="{i}"></span>'
-        )
-    
-    return f"""
-        <div class="banner-carousel">
-{chr(10).join(banner_items)}
-            <div class="banner-indicators">
-{chr(10).join(indicators)}
+    return '''            <div class="swiper-container" id="swiper-banner">
+                <div class="swiper-wrapper">
+''' + '\n'.join(slides) + '''
+                </div>
+                <div class="swiper-pagination"></div>
             </div>
-        </div>
-    """
+'''
 
 
 # ==================== 模板配置 ====================
@@ -372,11 +365,11 @@ DEFAULT_TEMPLATES = {
 }
 
 # ==================== 资源复制配置 ====================
-# 需要从templates目录复制到output目录的文件夹
-FOLDERS_TO_COPY = ["assets", "common", "css", "js", "vender"]
+# 需要从templates目录复制到output目录的文件夹（templates_index 使用 css, images, js）
+FOLDERS_TO_COPY = ["css", "images", "js"]
 
-# 需要从templates目录复制到output目录的文件
-FILES_TO_COPY = ["favicon.ico"]
+# 需要从templates目录复制到output目录的文件（favicon 在 images/ 下，随文件夹复制）
+FILES_TO_COPY = []
 
 # ==================== 名称简化规则配置 ====================
 # 城市名称简化规则（用于显示，移除后缀）

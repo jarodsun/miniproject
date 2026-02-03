@@ -1,0 +1,21 @@
+            <div class="nav-list">
+                <ul>
+                    <li><a href="../index.html">首页</a></li>
+                    <li><span> &gt;</span></li>
+                    <li>{{ 省份名称 }}</li>
+                </ul>
+            </div>
+            <div class="list-box">
+                <div class="title">
+                    <h2>{{ 省份名称 }}</h2>
+                </div>
+                <div class="item-wrap">
+                    <h3>下辖城市：</h3>
+                    <ul>
+                        {{ 下级列表 | safe }}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

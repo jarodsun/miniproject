@@ -138,13 +138,22 @@ def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dic
                 province_display = simplify_province_name(province_name)
                 region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{city_links}</dd>')
         
-        # 组合该地区的导航（使用 <ul><li> 结构，参考页面格式）
+        # 组合该地区的导航（使用新侧栏结构：address-item-left / address-item-right）
         if region_dl_items:
-            region_nav = f'<li><strong>{region_name}：</strong><dl>{"".join(region_dl_items)}</dl></li>'
+            region_nav = (
+                f'<li>\n'
+                f'                            <div class="address-item-left">{region_name}：</div>\n'
+                f'                            <div class="address-item-right">\n'
+                f'                                <dl>\n'
+                f'                                    {"".join(region_dl_items)}\n'
+                f'                                </dl>\n'
+                f'                            </div>\n'
+                f'                        </li>'
+            )
             nav_items.append(region_nav)
     
-    # 返回完整的导航列表，使用 <ul> 包裹
-    return f'<ul class="region-nav-list">{"".join(nav_items)}</ul>'
+    # 返回侧栏内的 <li> 列表（模板中已有 <ul> 包裹）
+    return "\n                        ".join(nav_items)
 
 
 def generate_root_html(all_data: Dict[str, Any], classified_provinces: dict) -> str:

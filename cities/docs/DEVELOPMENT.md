@@ -4,6 +4,8 @@
 
 本项目是一个批量生成中国行政区划静态 HTML 页面的系统。系统通过读取 JSON 数据文件，按照拼音建立文件夹结构，并使用 Jinja2 模板引擎生成对应的 HTML 文件。
 
+**模板说明**：当前生成程序使用 `templates_index/` 目录下的新页面样式（head/body_*/foot 三部分模板，Swiper 轮播、侧栏地区导航等）。旧版 `templates/` 目录保留作参考。
+
 ### 核心功能
 
 - 读取 `pcas.json` 和 `HK-MO-TW.json` 数据文件
@@ -31,7 +33,7 @@ cities/
 ├── data/                        # 数据文件目录
 │   ├── pcas.json               # 大陆省份数据
 │   └── HK-MO-TW.json           # 港澳台数据
-├── templates/                   # 模板文件目录（Jinja2 模板）
+├── templates_index/             # 模板文件目录（Jinja2 模板，当前使用的新样式）
 │   ├── head_template.html       # 页面头部模板
 │   ├── foot_template.html       # 页面底部模板
 │   ├── body_root_template.html  # 根页面内容模板
@@ -40,10 +42,11 @@ cities/
 │   ├── body_city_template.html  # 城市页面内容模板
 │   ├── body_district_template.html    # 区县页面内容模板
 │   ├── body_street_template.html      # 街道页面内容模板
-│   ├── assets/                 # 静态资源（图片、字体等）
 │   ├── css/                    # 样式文件
+│   ├── images/                 # 图片等静态资源
 │   ├── js/                     # JavaScript 文件
-│   └── ...                     # 其他资源文件
+│   └── index.html               # 原始完整页面（参考）
+├── templates/                   # 旧版模板目录（已切换至 templates_index）
 ├── output/                      # 输出目录（生成的 HTML 文件）
 └── docs/                        # 文档目录
     ├── DEVELOPMENT.md           # 开发文档
@@ -98,7 +101,7 @@ cities/
   - 实现：自动创建父目录，使用 UTF-8 编码写入
 
 - `copy_template_assets()`
-  - 功能：将 `templates/` 目录下的资源文件（CSS、JS、图片等）复制到 `output/` 目录
+  - 功能：将 `templates_index/` 目录下的资源文件（CSS、JS、图片等）复制到 `output/` 目录
   - 实现：从 `config.py` 读取需要复制的文件夹和文件列表，使用 `shutil` 进行复制
   - 用途：确保生成的 HTML 页面可以正确加载样式和脚本
 
@@ -120,8 +123,8 @@ cities/
   - `ROOT_PAGE_PRODUCTS`：根页面显示的产品信息
   - `get_product_context()`：获取产品信息上下文（根页面包含产品，其他页面为空）
 - **Banner 配置**：
-  - `BANNER_IMAGE_PATH`、`BANNER_ALT_TEXT`、`BANNER_LINK`、`BANNER_COUNT`
-  - `generate_banner_html()`：生成 Banner HTML（支持轮播）
+  - `BANNER_SLIDES`：Banner 轮播项列表（path、alt、link），与 templates_index 新样式一致
+  - `generate_banner_html()`：生成 Swiper 结构 Banner HTML（swiper-container / swiper-wrapper / swiper-slide）
 - **模板配置**：`DEFAULT_TEMPLATES`：默认模板文件名映射
 - **资源复制配置**：`FOLDERS_TO_COPY`、`FILES_TO_COPY`：需要复制的文件夹和文件列表
 - **名称简化规则**：
@@ -136,7 +139,7 @@ cities/
 **核心类**：
 
 - `HTMLRenderer`：HTML 模板渲染器类
-  - 使用 `FileSystemLoader` 从 `templates/` 目录加载模板
+  - 使用 `FileSystemLoader` 从 `templates_index/` 目录加载模板（配置见 `config.TEMPLATE_DIR`）
   - 支持自动转义 HTML 特殊字符
   - 组合 `head`、`body`、`foot` 三个模板生成完整 HTML
 
@@ -755,40 +758,35 @@ python3 generate_hk_mo_tw.py
 
 ### Banner 轮播
 
-根页面（`output/index.html`）会显示 Banner 轮播。
+根页面（`output/index.html`）会显示 Banner 轮播（Swiper 结构，与 templates_index 新样式一致）。
 
 **配置位置**：
 
 - Banner 配置在 `config.py` 中
-- `BANNER_IMAGE_PATH`：Banner 图片路径（相对于 output 目录）
-- `BANNER_ALT_TEXT`：Banner 图片 alt 文本
-- `BANNER_LINK`：Banner 链接 URL
-- `BANNER_COUNT`：Banner 数量（用于轮播）
-- `generate_banner_html()`：生成 Banner HTML 的函数
+- `BANNER_SLIDES`：轮播项列表，每项含 `path`（图片路径）、`alt`、`link`（相对于 output 目录）
+- `generate_banner_html()`：生成 Swiper HTML（`swiper-container` / `swiper-wrapper` / `swiper-slide` / `swiper-pagination`）
 
 **实现方式**：
 
-- 使用同一张图片进行轮播（通过 `BANNER_COUNT` 控制数量）
-- 生成轮播指示器（indicators）
-- 支持 JavaScript 控制轮播切换
+- 使用 Swiper 轮播结构，与 templates_index 的 CSS/JS 一致
+- 支持多张图片及对应链接（如 `./images/page/banner1.jpg` 等）
+- 依赖 `./js/swiper-4.3.5.min0fee.js` 与 `./css/swiper-4.3.5.min0fee.css` 进行轮播切换
 
 ## 资源复制功能说明
 
 ### 模板资源自动复制
 
-运行 `generate_all.py` 时，会自动将 `templates/` 目录下的资源文件复制到 `output/` 目录。
+运行 `generate_all.py` 时，会自动将 `templates_index/` 目录下的资源文件复制到 `output/` 目录。
 
-**复制的资源**：
+**复制的资源**（当前使用 templates_index 新样式）：
 
 - **文件夹**（从 `config.FOLDERS_TO_COPY` 读取）：
-  - `assets/`：静态资源（图片、字体等）
-  - `common/`：公共资源
-  - `css/`：样式文件
-  - `js/`：JavaScript 文件
-  - `vender/`：第三方库
+  - `css/`：样式文件（含 base、swiper、region 等）
+  - `images/`：图片等静态资源（含 page/banner、logo 等）
+  - `js/`：JavaScript 文件（含 jquery、swiper、region 等）
 
 - **文件**（从 `config.FILES_TO_COPY` 读取）：
-  - `favicon.ico`：网站图标
+  - 当前为空（favicon 位于 `images/` 下，随文件夹复制）
 
 **实现方式**：
 

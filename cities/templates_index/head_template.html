@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{{ 页面标题 | default(DEFAULT_TITLE) }}</title>
+    <meta name="description" content="{{ 页面描述 | default(DEFAULT_DESCRIPTION) }}"/>
+    <meta name="keywords" content="{{ 页面关键词 | default(DEFAULT_KEYWORDS) }}"/>
+    <link rel="canonical" href="{{ 当前页面URL地址 | default('') }}">
+    <meta itemprop="name" content="亿速云"/>
+    <meta itemprop="description" name="description" content="领先的全球云计算和云安全提供商！" />
+    <meta itemprop="image" content="./images/yisu_logo.png" />
+    <link rel="shortcut icon" href="./images/favicon.ico">
+    <link href="./css/base0fee.css" type="text/css" rel="stylesheet"/>
+    <link href="./css/swiper-4.3.5.min0fee.css" type="text/css" rel="stylesheet"/>
+    <link href="./css/2022common0fee.css" type="text/css" rel="stylesheet"/>
+    <link href="./css/page/region0fee.css" type="text/css" rel="stylesheet"/>
+    <script src="./js/jquery.min.js"></script>
+
+
+</head>
+<body>
+
+
+<div class="homepage-topbar  topbar-light">
+
+    <div class="homepage-topbar-mod">
+        <div class="homepage-topbar-top clearfix">
+            <div class="logo"><a href="https://www.yisu.com/"  title="云服务器,高防服务器,香港服务器,云数据库,网络与加速,通信服务-亿速云官网">
+                <img src="./images/logo-dark.png" alt="" class="logo-dark">
+                <img src="./images/logo-light.png" alt="" class="logo-light">
+            </a></div>
+            <!-- 移动端汉堡菜单按钮 -->
+            <button class="mobile-menu-toggle" aria-label="菜单">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="topbar-dropmenu-container">
+                <div class="homepage-dropmenu">
+                    <div class="auto-container dropdown-por">
+                                                    <div class="homepage-dropmenu-container">
+                                <div class="dropmenu-slide">
+                                    <div class="dropmenu-slide-content">
+                                        <div class="slide-hotpro">
+                                            <div class="slide-hotpro-tit">产品</div>
+                                            <dl>
+                                                <dt>热门</dt>
+                                                <dd><a href="https://www.yisu.com/cloud/">云服务器</a></dd>
+                                                <dd><a href="https://www.yisu.com/ddos/">高防服务器</a></dd>
+                                                <dd><a href="https://www.yisu.com/physicsserver/">裸金属服务器</a></dd>
+                                                <dd><a href="https://www.yisu.com/lightserver/">轻量应用服务器</a></dd>
+                                                <dd><a href="https://www.yisu.com/ip/">高防IP</a></dd>
+                                                <dd><a href="https://www.yisu.com/ddoscdn/">高防CDN</a></dd>
+                                            </dl>
+                                        </div>
+                                        <div class="slide-zixun">
+
+                                            <div class="look-all-product"><a href="https://www.yisu.com/produce/">查看全部产品<i></i></a></div>
+                                            <p>售前咨询：<span>400-100-2938</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dropmenu-content">
+                                                                            <div class="menu-all-product">
+                                            <dl>
+                                                <dt><img src="./images/pro-type-1.png" alt="">计算</dt>
+                                                <dd><a href="https://www.yisu.com/cloud/">云服务器<img src="./images/ysnav-icon-hot.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/physicsserver/">裸金属服务器<img src="./images/ysnav-icon-hot.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/lightserver/">轻量应用服务器<img src="./images/ysnav-icon-hot.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/gpu/">GPU服务器<img src="./images/ysnav-icon-new.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/trusteeship/">机柜租用</a></dd>
+                                                <dd><a href="https://www.yisu.com/cloudcomputer/">云电脑</a></dd>
+                                            </dl>
+                                            <dl>
+                                                <dt><img src="./images/pro-type-2.png" alt="">安全</dt>
+                                                <dd><a href="https://www.yisu.com/ddos/">高防服务器<img src="./images/ysnav-icon-hot.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/ip/">高防IP<img src="./images/ysnav-icon-hot.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/ddoscdn/">高防CDN<img src="./images/ysnav-icon-hot.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/dns/">高防DNS云解析</a></dd>
+                                                <dd><a href="https://www.yisu.com/ssl/">SSL证书</a></dd>
+                                            </dl>
+                                            <dl>
+                                                <dt><img src="./images/pro-type-3.png" alt="">数据库</dt>
+                                                <dd><a href="https://www.yisu.com/mysql/">云数据库MySQL<img src="./images/ysnav-icon-hot.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/redis/">云数据库Redis</a></dd>
+                                                <dd><a href="https://www.yisu.com/mongodb/">云数据库MongoDB</a></dd>
+                                                <dd><a href="https://www.yisu.com/memcache/">云数据库Memcached</a></dd>
+                                            </dl>
+                                            <dl>
+                                                <dt><img src="./images/pro-type-4.png" alt="">网络和加速</dt>
+                                                <dd><a href="https://www.yisu.com/cdn/">CDN云加速<img src="./images/ysnav-icon-hot.png" alt=""></a></dd>
+                                                <dd><a href="https://www.yisu.com/dcdn/">全站加速</a></dd>
+                                                <dd><a href="https://www.yisu.com/slb/">负载均衡SLB</a></dd>
+                                                <dd><a href="https://www.yisu.com/oss/">对象储存OSS</a></dd>
+                                                <dd><a href="https://www.yisu.com/sdwan/">SD-WAN</a></dd>
+                                            </dl>
+                                            <dl>
+                                                <dt><img src="./images/pro-type-5.png" alt="">企业服务</dt>
+                                                <dd><a href="https://www.yisu.com/sms/">短信服务</a></dd>
+                                                <dd><a href="https://www.yisu.com/qidian/">腾讯企点</a></dd>
+                                            </dl>
+                                        </div>
+
+                                                                    </div>
+                            </div>
+                                            </div>
+
+                    <div class="auto-container dropdown-services">
+                        <div class="homepage-dropmenu-container">
+                            <div class="dropmenu-slide">
+                                <div class="dropmenu-slide-content">
+                                    <div class="slide-introduce">
+                                        <h3>支持服务</h3>
+                                        <div>无论何时何地，亿速云各领域专家
+                                            就在您的身边，帮助您提升业务价
+                                            值与服务。</div>
+                                    </div>
+                                    <div class="slide-zixun">
+
+                                        <p>售前咨询：<span>400-100-2938</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropmenu-content">
+                                <div class="dropmenu-content-group-box">
+                                    <div class="dropmenu-content-group">
+                                        <div class="main-link-list clearfix">
+                                            <div class="main-link">
+                                                <img src="./images/services-img01.png" alt="">
+                                                <div><a href="javascript:;">帮助文档</a></div>
+                                                <p>让您全面了解并上手亿速云产品</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/services-img02.png" alt="">
+                                                <div><a href="javascript:;">入门教程</a></div>
+                                                <p>常见入门级使用教程</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/services-img03.png" alt="">
+                                                <div><a href="javascript:;">API 开发</a></div>
+                                                <p>对外 API 开发文档中心</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/services-img04.png" alt="">
+                                                <div><a href="javascript:;">在线工单</a></div>
+                                                <p>您历史提交的工单</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/services-img05.png" alt="">
+                                                <div><a href="javascript:;">我要投诉</a></div>
+                                                <p>您的每一条意见，我们都严谨处理</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/services-img06.png" alt="">
+                                                <div><a href="javascript:;">我要建议</a></div>
+                                                <p>您的每一条建议，我们都认真对待</p>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="auto-container dropdown-college">
+                        <div class="homepage-dropmenu-container">
+                            <div class="dropmenu-slide">
+                                <div class="dropmenu-slide-content">
+                                    <div class="slide-introduce">
+                                        <h3>云学院</h3>
+                                        <div>面向开发者的技术学习、交流实践
+                                            平台。</div>
+                                    </div>
+                                    <div class="slide-zixun">
+                                        <p>售前咨询：<span>400-100-2938</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropmenu-content">
+                                <div class="dropmenu-content-group-box">
+                                    <div class="dropmenu-content-group">
+                                        <div class="main-link-list clearfix">
+                                            <div class="main-link">
+                                                <img src="./images/college-img01.png" alt="">
+                                                <div><a href="https://www.yisu.com/help/quickstart/">产品教程</a></div>
+                                                <p>常见入门级使用教程</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/college-img02.png" alt="">
+                                                <div><a href="https://www.yisu.com/help/practice/">最佳实践</a></div>
+                                                <p>有技术含量的技术方案教程</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/college-img03.png" alt="">
+                                                <div><a href="https://www.yisu.com/jc/">技术教程</a></div>
+                                                <p>传递技术力量，共建行业生态</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/college-img04.png" alt="">
+                                                <div><a href="https://www.yisu.com/ask/">技术问答</a></div>
+                                                <p>持续更新的技术问答</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="auto-container dropdown-partner">
+                        <div class="homepage-dropmenu-container">
+                            <div class="dropmenu-slide">
+                                <div class="dropmenu-slide-content">
+                                    <div class="slide-introduce">
+                                        <h3>合作与生态</h3>
+                                        <div>亿速云始终保持着开放的态度，发
+                                            挥自身多年的行业能力积累，为生
+                                            态和行业伙伴赋能。</div>
+                                    </div>
+                                    <div class="slide-zixun">
+                                        <p>售前咨询：<span>400-100-2938</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropmenu-content">
+                                <div class="dropmenu-content-group-box">
+                                    <div class="dropmenu-content-group">
+                                        <div class="main-link-list list-400 clearfix">
+                                            <div class="main-link">
+                                                <img src="./images/partner-img01.png" alt="">
+                                                <div><a href="https://www.yisu.com/yiparter/agent/">代理伙伴</a></div>
+                                                <p>分销亿速云产品，提供OEM销售平台</p>
+                                            </div>
+                                            <div class="main-link">
+                                                <img src="./images/partner-img02.png" alt="">
+                                                <div><a href="https://www.yisu.com/yiparter/">亿大使</a></div>
+                                                <p>推广亿速云或邀新用户给予奖励</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="page-list">
+                    <div class="hover-line"></div>
+                    <ul>
+                        <li id='huodong_nav_777'><a href="https://www.yisu.com/coupon/">活动</a></li>
+                        <li id='goods_nav_777'><a href="#">产品<i class="arrow"></i></a></li>
+                        <li id='case_nav_777' ><a href="https://www.yisu.com/case/">客户案例</a></li>
+                        <li id='help_nav_777' ><a href="https://www.yisu.com/help/">帮助文档</a></li>
+                        <li id='college_nav_777'>
+                            <a href="javascript:;">云学院 <i class="arrow"></i></a>
+                        </li>
+                        <li id='partner_nav_777'>
+                            <a href="javascript:;">合作伙伴 <i class="arrow"></i></a>
+                        </li>
+                        <li id='about_nav_777' ><a href="https://www.yisu.com/about/">关于我们</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mobile-menu">
+                <ul>
+                    <li><a href="https://www.yisu.com/coupon/">活动</a></li>
+                    <li><a href="https://www.yisu.com/cloud/">云服务器</a></li>
+                    <li><a href="https://www.yisu.com/ddos/">高防服务器</a></li>
+                    <li><a href="https://www.yisu.com/case/">客户案例</a></li>
+                    <li><a href="https://www.yisu.com/help/">帮助文档</a></li>
+                    <li><a href="https://www.yisu.com/about/">关于我们</a></li>
+                </ul>
+            </div>
+            
+            <div class="topbar-logged-in login-box" id="user_info" style="float: right">
+                <a href="https://uc.yisu.com/vhost" class="console-link">控制台</a>
+            </div>
+            
+            
+        </div></div></div>
+</div>
+
+</div>
+
+<div class="main-wrap">
+
+    <div class="content">
+        <div class="content-wrap">
+
+</body>
+</html>

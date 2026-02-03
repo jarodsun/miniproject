@@ -1,0 +1,126 @@
+<div class="footer">
+
+    <div class="other-link clearfix">
+        <div class="link-look clearfix">
+            <div class="link-list">
+                <div class="link-title">产品服务</div>
+                <ul>
+                    <li><a href="https://www.yisu.com/cloud/">云服务器</a></li>
+                    <li><a href="https://www.yisu.com/ddos/">高防服务器</a></li>
+                    <li><a href="https://www.yisu.com/ip/">高防IP</a></li>
+                    <li><a href="https://www.yisu.com/physicsserver/">裸金属服务器</a></li>
+                    <li><a href="https://www.yisu.com/trusteeship/">机柜租用</a></li>
+                    <li><a href="https://www.yisu.com/ssl/">SSL证书</a></li>
+                    <li><a href="https://www.yisu.com/ddoscdn/">高防CDN</a></li>
+                </ul>
+            </div>
+            <div class="link-list">
+                <div class="link-title">地区划分</div>
+                <ul>
+                    <li>中国<a href="https://www.yisu.com/hk/">香港服务器</a></li>
+                    <li><a href="https://www.yisu.com/usa/">美国服务器</a></li>
+                    <li><a href="https://www.yisu.com/germany/">欧洲服务器</a></li>
+                    <li><a href="https://www.yisu.com/japan/">日本服务器</a></li>
+                    <li><a href="https://www.yisu.com/korea/">韩国服务器</a></li>
+                    <li><a href="https://www.yisu.com/singapore/">新加坡服务器</a></li>
+                </ul>
+            </div>
+            <div class="link-list">
+                <div class="link-title">专题活动</div>
+                <ul>
+                    <li><a href="https://uc.yisu.com/vhost" rel="nofollow" target="_blank" class="c_login">控制台</a></li>
+                    <li><a href="https://www.yisu.com/appmarket/">应用市场</a></li>
+                    <li><a href="https://www.yisu.com/coupon/">最新活动</a></li>
+                </ul>
+            </div>
+            <div class="link-list">
+                <div class="link-title">帮助支持</div>
+                <ul>
+                    <li><a href="https://www.yisu.com/help/">帮助中心</a></li>
+                    <li><a href="https://www.yisu.com/help/index_38_41.html">网站备案</a></li>
+                    <li><a href="https://www.yisu.com/help/index_45_46.html" rel="nofollow">法律条款</a></li>
+                    <li><a href="index.html">全国服务</a></li>
+                    <li><a href="https://www.yisu.com/cve/">安全漏洞</a></li>
+                    <li><a href="https://www.yisu.com/theme/">主题地图</a></li>
+                </ul>
+            </div>
+            <div class="link-list">
+                <div class="link-title">关于我们</div>
+                <ul>
+                    <li><a href="https://www.yisu.com/about/" rel="nofollow">关于亿速云</a></li>
+                    <li><a href="https://www.yisu.com/case/">客户案例</a></li>
+                    <li><a href="https://www.yisu.com/news/">新闻资讯</a></li>
+                    <li><a href="https://www.yisu.com/zixun/time/">资讯地图</a></li>
+                    <li><a href="https://www.yisu.com/ask/time/">问答地图</a></li>
+                    <li><a href="https://www.yisu.com/about/contact.html">联系我们</a></li>
+                    <li><a href="https://www.yisu.com/employ/">人才招聘</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© {{ CURRENT_YEAR }} Yisu Cloud Ltd. All Rights Reserved.</p>
+        <p><span>广州亿速云计算有限公司</span><span><a href="http://beian.miit.gov.cn/" style="color: #6C6E73;" target="_blank" rel="nofollow">粤ICP备17096448号</a>
+        </span><span><span class="police-icon"></span>粤公网安备 44010402001142号</span><span>增值电信业务经营许可证编号：B1-20181529</span></p>
+    </div>
+</div>
+{% if main_site_footer %}
+<div class="footer-custom">
+    {{ main_site_footer | safe }}
+</div>
+{% endif %}
+
+<script type="text/javascript" src="./js/swiper-4.3.5.min0fee.js"></script>
+<script type="text/javascript" src="./js/page/region0fee.js"></script>
+<script type="text/javascript">
+    // 移动端菜单交互
+    (function() {
+        var mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        var mobileMenu = document.querySelector('.mobile-menu');
+        
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+                if (mobileMenu.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            var menuLinks = mobileMenu.querySelectorAll('a');
+            menuLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (mobileMenu.classList.contains('active') && 
+                    !mobileMenu.contains(e.target) && 
+                    !mobileMenuToggle.contains(e.target)) {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+        
+        var sidebarToggle = document.querySelector('.sidebar-toggle');
+        var sidebarContent = document.querySelector('.sidebar-content');
+        
+        if (sidebarToggle && sidebarContent) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebarContent.classList.toggle('active');
+                if (sidebarContent.classList.contains('active')) {
+                    this.textContent = '收起地区导航';
+                } else {
+                    this.textContent = '展开地区导航';
+                }
+            });
+        }
+    })();
+</script>
