@@ -60,9 +60,15 @@ def classify_provinces(provinces: List[Tuple[str, str]]) -> dict:
         # 将未分类的省份添加到"其他"类别（如果需要）
         # classified["其他"] = unclassified
     
-    # 对每个地区的省份按名称排序
+    # 对每个地区的省份排序：直辖市等按 REGIONS 中定义的顺序，其余按名称
     for region in classified:
-        classified[region].sort(key=lambda x: x[0])
+        order_list = REGIONS.get(region)
+        if order_list:
+            # 按 REGIONS 中该地区的省份顺序排序
+            order_map = {name: i for i, name in enumerate(order_list)}
+            classified[region].sort(key=lambda x: order_map.get(x[0], 999))
+        else:
+            classified[region].sort(key=lambda x: x[0])
     
     return classified
 
