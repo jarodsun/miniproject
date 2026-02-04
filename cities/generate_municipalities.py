@@ -90,6 +90,62 @@ def build_municipality_sidebar_html(
     return sidebar_html
 
 
+def build_district_sidebar_html(
+    district_name: str,
+    streets: List[Tuple[str, str]],
+) -> str:
+    """
+    区页面右侧侧栏：与首页/直辖市页结构一致；address-item-left 用「本区全称」（如东城区：）；
+    address-item-right 仅 dd 街道（无 dt），链接为 {街道拼音}/index.html。
+    """
+    nav_items = []
+    for idx, (data_for, label, _) in enumerate(SIDEBAR_PRODUCTS):
+        active_class = "sidebar-nav-active" if idx == 0 else ""
+        nav_items.append(
+            f'<li class="{active_class}" data-for="{data_for}">{label}</li>'
+        )
+    nav_list_html = "\n".join(nav_items)
+
+    # 仅 dd：本区下街道，多个用 | 分隔，链接为 街道拼音/index.html
+    street_links = " | ".join([
+        f'<a href="{sp}/index.html">{sn}</a>'
+        for sn, sp in streets
+    ])
+    dd_content = f"<dd>{street_links}</dd>" if street_links else "<dd></dd>"
+
+    address_lists = []
+    for idx, (data_for, label, _) in enumerate(SIDEBAR_PRODUCTS):
+        active = " active" if idx == 0 else ""
+        block = f"""                <div class="address-list product-{data_for}{active}">
+                    <ul>
+                        <li>
+                            <div class="address-item-left">{district_name}：</div>
+                            <div class="address-item-right">
+                                <dl>
+                                    {dd_content}
+                                </dl>
+                            </div>
+                        </li>
+                    </ul>
+                </div>"""
+        address_lists.append(block)
+
+    address_lists_html = "\n".join(address_lists)
+
+    sidebar_html = f"""<div class="sidebar">
+            <button class="sidebar-toggle" aria-label="展开地区导航">展开地区导航</button>
+            <div class="sidebar-content">
+                <div class="sidebar-nav-list">
+                    <ul>
+{nav_list_html}
+                    </ul>
+                </div>
+{address_lists_html}
+            </div>
+        </div>"""
+    return sidebar_html
+
+
 def generate_municipality_html(
     municipality_name: str,
     districts_with_streets: DistrictsWithStreets,
@@ -120,6 +176,44 @@ def generate_municipality_html(
     html = renderer.render_html(
         head_template=DEFAULT_TEMPLATES["head"],
         body_template=DEFAULT_TEMPLATES["body_municipality"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
+        context=context
+    )
+    return html
+
+
+def generate_municipality_district_html(
+    district_name: str,
+    municipality_name: str,
+    streets: List[Tuple[str, str]],
+) -> str:
+    """
+    生成直辖市下区页面 HTML。左侧与首页、直辖市页完全一致（nav、banner、5 个 list-box），
+    右侧侧栏：本区全称 + 仅 dd 街道。
+    district_name: 区名称（如 东城区）
+    municipality_name: 直辖市名称（如 北京市）
+    streets: [(街道名称, 街道拼音), ...]
+    """
+    区页面右侧侧栏 = build_district_sidebar_html(district_name, streets)
+
+    banner_html = generate_banner_html()
+    product_context = get_product_context(include_products=True)
+    seo_context = get_seo_context(page_type="district", district_name=district_name)
+
+    renderer = get_renderer()
+    context = {
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
+        "banner": banner_html,
+        "区页面右侧侧栏": 区页面右侧侧栏,
+        "直辖市名称": municipality_name,
+        **product_context,
+        **seo_context,
+    }
+
+    html = renderer.render_html(
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_municipality_district"],
         foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
@@ -247,13 +341,11 @@ def process_municipality(province_name: str, province_data: Dict[str, Any]):
     for district_name, district_pinyin, streets in districts_with_streets:
         district_dir = province_dir / district_pinyin
 
-        # 生成区级别 HTML（三级页需重写资源路径为 ../../）
-        district_html = generate_district_html(
+        # 生成区页面 HTML（与直辖市页同布局：左侧 nav/banner/5 list-box，右侧本区+dd 街道；三级页需重写资源路径为 ../../）
+        district_html = generate_municipality_district_html(
             district_name,
-            province_name,  # 直辖市时，城市名称等于省份名称
-            province_name,
+            province_name,  # 直辖市名称
             streets,
-            "../"  # back_path
         )
         district_file = district_dir / "index.html"
         depth = len(district_file.relative_to(OUTPUT_DIR).parts) - 1

@@ -359,6 +359,7 @@ DEFAULT_TEMPLATES = {
     "body_root": "body_root_template.html",
     "body_province": "body_province_template.html",
     "body_municipality": "body_municipality_template.html",
+    "body_municipality_district": "body_municipality_district_template.html",
     "body_city": "body_city_template.html",
     "body_district": "body_district_template.html",
     "body_street": "body_street_template.html",
