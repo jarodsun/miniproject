@@ -208,6 +208,7 @@ def generate_municipality_district_html(
         "banner": banner_html,
         "区页面右侧侧栏": 区页面右侧侧栏,
         "直辖市名称": municipality_name,
+        "区县名称": district_name,
         **product_context,
         **seo_context,
     }
