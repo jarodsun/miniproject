@@ -172,7 +172,7 @@ output/
 
 - **普通省份**：显示该省下的所有市列表；支持变量 `{省份名称}`、`{省份拼音}`、`{下级列表}` 等。
 - **直辖市**（`body_municipality_template.html`）：
-  - **左侧主内容**与首页**完全一致**：导航（首页 + 地区导航）、轮播图（banner）、云服务器 / 高防服务器 / 服务器托管 / IDC / 机柜 5 个 list-box（样式与内容同首页）。
+  - **左侧主内容**与首页**完全一致**：导航（面包屑：首页、当前直辖市名称，见「直辖市页面右侧侧栏规则」§1）、轮播图（banner）、云服务器 / 高防服务器 / 服务器托管 / IDC / 机柜 5 个 list-box（样式与内容同首页）。
   - **右侧**为直辖市专用侧栏（见下文「直辖市页面右侧侧栏规则」），由生成脚本注入 `{直辖市右侧侧栏}`；模板还使用 `{banner}`、产品相关变量（与首页一致）。
 
 **市级别 Body 模板** (`body_city_template.html`)：
@@ -343,7 +343,8 @@ output/
 ### 1. 页面与主内容
 
 - **页面路径**：`output/{直辖市拼音}/index.html`，如 `beijingshi/index.html`（北京市）、`shanghaishi/index.html`（上海市）。
-- **主内容（左侧）**：与首页**完全一致**——导航（首页链接 `../index.html`、地区导航）、轮播图（banner）、云服务器 / 高防服务器 / 服务器托管 / IDC / 机柜 5 个 list-box（样式与文案同首页）。
+- **主内容（左侧）**：与首页**完全一致**——导航、轮播图（banner）、云服务器 / 高防服务器 / 服务器托管 / IDC / 机柜 5 个 list-box（样式与文案同首页）。
+- **面包屑（nav-list）**：第一项「首页」链接到 `../index.html`；第二项为**当前直辖市名称**（如「北京市」），纯文字、不链接，表示当前页。不展示「地区导航」。
 - **Head / Foot**：与首页共用同一 head、foot 模板；二级页面需使用相对上级路径引用 css/images/js（见「二级及以下页面资源路径」）。
 
 ### 2. 右侧侧栏整体结构
@@ -389,7 +390,8 @@ output/
 ### 1. 页面与主内容
 
 - **页面路径**：`output/{直辖市拼音}/{区拼音}/index.html`，如 `beijingshi/dongchengqu/index.html`（北京市东城区）、`shanghaishi/huangpuqu/index.html`（上海市黄浦区）。
-- **主内容（左侧）**：与首页、直辖市页**完全一致**——导航（首页链接 `../../index.html`、直辖市页链接 `../index.html`、地区导航）、轮播图（banner）、云服务器 / 高防服务器 / 服务器托管 / IDC / 机柜 5 个 list-box（样式与文案同首页）。
+- **主内容（左侧）**：与首页、直辖市页**完全一致**——导航、轮播图（banner）、云服务器 / 高防服务器 / 服务器托管 / IDC / 机柜 5 个 list-box（样式与文案同首页）。
+- **面包屑（nav-list）**：第一项「首页」链接到 `../../index.html`；第二项为直辖市名称（如「北京市」）链接到 `../index.html`；第三项为**当前区名称**（如「东城区」），纯文字、不链接，表示当前页。不展示「地区导航」。
 - **Head / Foot**：与首页、直辖市页共用同一 head、foot 模板；三级页面需使用相对上级路径引用 css/images/js（见「二级及以下页面资源路径」），如 `../../css/`、`../../images/`、`../../js/`。
 
 ### 2. 右侧侧栏整体结构
@@ -609,7 +611,7 @@ output/
 
 **直辖市示例（北京市首页 - beijingshi/index.html）**：
 
-页面结构与首页一致：共用 head/foot；**左侧主内容**为导航（首页 + 地区导航）、轮播图（banner）、云服务器 / 高防 / 托管 / IDC / 机柜 5 个 list-box；**右侧侧栏**为直辖市专用：`.address-item-left` 为「北京市：」，`.address-item-right` 内为 `<dl>`，dt 放区（如 `<a href="dongchengqu/index.html">东城区</a>`），dd 放该区街道（如 `<a href="dongchengqu/donghuamenjiedao/index.html">东华门街道</a> | …`）。资源路径使用 `../` 引用 output 根目录的 css/images/js。
+页面结构与首页一致：共用 head/foot；**左侧主内容**为导航（面包屑：首页、北京市）、轮播图（banner）、云服务器 / 高防 / 托管 / IDC / 机柜 5 个 list-box；**右侧侧栏**为直辖市专用：`.address-item-left` 为「北京市：」，`.address-item-right` 内为 `<dl>`，dt 放区（如 `<a href="dongchengqu/index.html">东城区</a>`），dd 放该区街道（如 `<a href="dongchengqu/donghuamenjiedao/index.html">东华门街道</a> | …`）。资源路径使用 `../` 引用 output 根目录的 css/images/js。
 
 **普通省份示例（河北省首页 - hebeisheng/index.html）**：
 ```html
