@@ -169,6 +169,7 @@ def generate_municipality_html(
         "main_site_footer": DEFAULT_FOOTER,
         "banner": banner_html,
         "直辖市右侧侧栏": 直辖市右侧侧栏,
+        "直辖市名称": municipality_name,
         **product_context,
         **seo_context,
     }
