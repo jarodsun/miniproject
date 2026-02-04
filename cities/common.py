@@ -37,6 +37,21 @@ def to_pinyin(text: str) -> str:
     return pinyin
 
 
+def rewrite_asset_prefix(html_content: str, depth: int) -> str:
+    """
+    将 HTML 中的资源路径 ./ 改为相对上级的前缀，供二级及以下页面正确引用 output 根目录的 css/images/js。
+    depth: 当前页面相对 OUTPUT_DIR 的层级数。例如 output/beijingshi/index.html 为 1，output/beijingshi/dongchengqu/index.html 为 2。
+    depth=0 时不修改；depth>=1 时用 \"../\" * depth 替换所有 href=\"./\", src=\"./\", content=\"./\"
+    """
+    if depth <= 0:
+        return html_content
+    prefix = "../" * depth
+    html_content = html_content.replace('href="./', f'href="{prefix}')
+    html_content = html_content.replace('src="./', f'src="{prefix}')
+    html_content = html_content.replace('content="./', f'content="{prefix}')
+    return html_content
+
+
 def write_html_file(file_path: Path, html_content: str):
     """
     写入 HTML 文件

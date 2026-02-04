@@ -487,3 +487,13 @@ CURRENT_YEAR = get_current_year()
 # 直辖市数据中的"市辖区"键名
 MUNICIPALITY_DISTRICTS_KEY = "市辖区"
 
+# 首页/直辖市页右侧侧栏产品列表（与 requirements_v2 地区导航规则一致）
+# (data-for, 显示名, 产品页文件名)
+SIDEBAR_PRODUCTS = [
+    ("cloud", "云服务器", "cloud.html"),
+    ("ddos", "高防服务器", "ddos.html"),
+    ("csr", "服务器托管", "csr.html"),
+    ("idc", "IDC", "idc.html"),
+    ("trusteeship", "机柜", "trusteeship.html"),
+]
+

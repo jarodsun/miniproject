@@ -35,6 +35,16 @@ HONG_KONG = "香港特别行政区"
 MACAO = "澳门特别行政区"
 TAIWAN = "台湾省"
 
+# 首页/直辖市页右侧侧栏产品列表（与 requirements_v2 首页地区导航规则一致）
+# (data-for, 显示名, 产品页文件名)
+SIDEBAR_PRODUCTS = [
+    ("cloud", "云服务器", "cloud.html"),
+    ("ddos", "高防服务器", "ddos.html"),
+    ("csr", "服务器托管", "csr.html"),
+    ("idc", "IDC", "idc.html"),
+    ("trusteeship", "机柜", "trusteeship.html"),
+]
+
 
 def to_pinyin(text: str) -> str:
     """
@@ -111,32 +121,145 @@ def generate_province_html(province_name: str, cities: List[Tuple[str, str]]) ->
     return html
 
 
+def _municipality_short_name(name: str) -> str:
+    """直辖市显示用简称，如 北京市 -> 北京"""
+    if name and name.endswith("市"):
+        return name[:-1]
+    return name
+
+
+def build_municipality_sidebar_html(
+    municipality_name: str,
+    municipality_slug: str,
+    districts: List[Tuple[str, str]],
+) -> str:
+    """
+    按 requirements_v2 直辖市页面右侧侧栏规则，生成直辖市页的右侧侧栏 HTML。
+    - 产品切换（与首页一致）
+    - 当前层级说明 + 返回首页
+    - 本市下辖区列表，每个产品一套列表，链接为 {区拼音}/{产品页}.html
+    """
+    short_name = _municipality_short_name(municipality_name)
+    # 返回首页链接（直辖市页在 output/beijing/ 下，首页为 output/index.html）
+    back_link = '<a href="../index.html">返回全国</a>'
+
+    nav_items = []
+    for idx, (data_for, label, _) in enumerate(SIDEBAR_PRODUCTS):
+        active_class = "sidebar-nav-active" if idx == 0 else ""
+        nav_items.append(
+            f'<li class="{active_class}" data-for="{data_for}">{label}</li>'
+        )
+    nav_list_html = "\n".join(nav_items)
+
+    address_lists = []
+    for idx, (data_for, label, page_suffix) in enumerate(SIDEBAR_PRODUCTS):
+        active = " active" if idx == 0 else ""
+        # 每个产品下列出同一套区，链接后缀不同
+        district_links = " ".join([
+            f'<a href="{dp}/{page_suffix}">{dn}</a>'
+            for dn, dp in districts
+        ])
+        block = f"""                            <div class="address-list product-{data_for}{active}">
+                    <ul>
+                        <li>
+                            <div class="address-item-left">下辖区县：</div>
+                            <div class="address-item-right">
+                                <dl>
+                                    <dt>{district_links}</dt>
+                                </dl>
+                            </div>
+                        </li>
+                    </ul>
+                </div>"""
+        address_lists.append(block)
+
+    address_lists_html = "\n".join(address_lists)
+
+    sidebar_html = f"""        <div class="sidebar">
+            <button class="sidebar-toggle" aria-label="展开地区导航">展开地区导航</button>
+            <div class="sidebar-content">
+                <div class="sidebar-current">
+                    <p class="sidebar-current-label">当前：{short_name}</p>
+                    <p class="sidebar-back">{back_link}</p>
+                </div>
+                <div class="sidebar-nav-list">
+                    <ul>
+{nav_list_html}
+                    </ul>
+                </div>
+{address_lists_html}
+            </div>
+        </div>"""
+    return sidebar_html
+
+
 def generate_municipality_html(municipality_name: str, districts: List[Tuple[str, str]]) -> str:
     """
-    生成直辖市级别 HTML
+    生成直辖市级别 HTML（含右侧侧栏，符合 requirements_v2 直辖市页面右侧侧栏规则）。
+    - 主内容区：直辖市名称 + 下辖区县列表（链接到各区 index.html）
+    - 右侧侧栏：产品切换 + 当前市 + 返回全国 + 下辖区县（链接到 {区拼音}/cloud.html 等）
     municipality_name: 直辖市名称
     districts: [(区名称, 区拼音), ...]
     """
+    municipality_slug = to_pinyin(municipality_name)
+    short_name = _municipality_short_name(municipality_name)
+
+    # 主内容：下辖区县列表（链接到区级 index.html）
     district_list_html = "\n".join([
         f'        <li><a href="{district_pinyin}/index.html">{district_name}</a></li>'
         for district_name, district_pinyin in districts
     ])
-    
+
+    sidebar_html = build_municipality_sidebar_html(municipality_name, municipality_slug, districts)
+
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{municipality_name} - 行政区划</title>
+    <style>
+        .page-wrap {{ display: flex; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }}
+        .main-content {{ flex: 1; min-width: 280px; padding: 1rem; }}
+        .sidebar {{ width: 280px; padding: 1rem; border-left: 1px solid #eee; }}
+        .sidebar-nav-list ul {{ list-style: none; padding-left: 0; }}
+        .sidebar-nav-list li {{ padding: 0.25rem 0; cursor: pointer; }}
+        .address-list {{ display: none; }}
+        .address-list.active {{ display: block; }}
+        .address-item-left {{ font-weight: bold; margin-bottom: 0.25rem; }}
+        .address-item-right dt a {{ margin-right: 0.5rem; }}
+        .sidebar-current {{ margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }}
+    </style>
 </head>
 <body>
-    <div class="municipality">
-        <h1>{municipality_name}</h1>
-        <h2>下辖区县：</h2>
-        <ul>
+    <div class="page-wrap">
+        <div class="main-content">
+            <div class="municipality">
+                <h1>{municipality_name}</h1>
+                <h2>下辖区县：</h2>
+                <ul>
 {district_list_html}
-        </ul>
+                </ul>
+            </div>
+        </div>
+{sidebar_html}
     </div>
+    <script>
+    (function() {{
+        var nav = document.querySelector('.sidebar-nav-list');
+        if (!nav) return;
+        nav.addEventListener('click', function(e) {{
+            var li = e.target.closest('li[data-for]');
+            if (!li) return;
+            var dataFor = li.getAttribute('data-for');
+            document.querySelectorAll('.address-list.active').forEach(function(el) {{ el.classList.remove('active'); }});
+            var list = document.querySelector('.product-' + dataFor);
+            if (list) list.classList.add('active');
+            nav.querySelectorAll('li').forEach(function(el) {{ el.classList.remove('sidebar-nav-active'); }});
+            li.classList.add('sidebar-nav-active');
+        }});
+    }})();
+    </script>
 </body>
 </html>"""
     return html
