@@ -18,13 +18,61 @@ from common import (
 )
 from html_renderer import get_renderer
 from config import (
-    DATA_FILE, HK_MO_TW_FILE, OUTPUT_DIR,
+    DATA_FILE, HK_MO_TW_FILE, OUTPUT_DIR, DATA_DIR,
     REGIONS, REGION_ORDER,
     DEFAULT_PAGE_URL, DEFAULT_FOOTER,
     generate_banner_html, get_product_context, get_seo_context,
     simplify_city_name, simplify_province_name, simplify_district_name,
     simplify_special_region_name, MUNICIPALITY_DISTRICTS_KEY
 )
+
+# 港澳台名称映射文件路径
+HK_MO_TW_NAME_MAPPING_FILE = DATA_DIR / "HK-MO-TW_name_mapping.json"
+
+
+def load_name_mapping() -> Dict[str, Any]:
+    """
+    加载港澳台名称映射文件
+    
+    Returns:
+        名称映射字典
+    """
+    if not HK_MO_TW_NAME_MAPPING_FILE.exists():
+        print(f"警告: 名称映射文件不存在: {HK_MO_TW_NAME_MAPPING_FILE}")
+        return {}
+    
+    try:
+        with open(HK_MO_TW_NAME_MAPPING_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"警告: 无法读取名称映射文件: {e}")
+        return {}
+
+
+def get_hk_mo_tw_path_slug(province_name: str, name_mapping: Dict[str, Any]) -> str:
+    """
+    获取港澳台的英文路径slug
+    
+    Args:
+        province_name: 省份名称（如「香港特别行政区」「澳门特别行政区」「台湾省」）
+        name_mapping: 名称映射字典
+        
+    Returns:
+        英文路径slug，如果找不到则使用拼音
+    """
+    if province_name == HONG_KONG:
+        region_key = "香港"
+    elif province_name == MACAO:
+        region_key = "澳门"
+    elif province_name == TAIWAN:
+        region_key = "台湾"
+    else:
+        return to_pinyin(province_name)
+    
+    if region_key in name_mapping:
+        return name_mapping[region_key].get("path_slug", to_pinyin(province_name))
+    else:
+        return to_pinyin(province_name)
 
 
 def classify_provinces(provinces: List[Tuple[str, str]]) -> dict:
@@ -73,13 +121,14 @@ def classify_provinces(provinces: List[Tuple[str, str]]) -> dict:
     return classified
 
 
-def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dict) -> str:
+def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dict, name_mapping: Dict[str, Any]) -> str:
     """
     生成地区导航列表 HTML（参考 yisu.com/city/ 的格式）
     
     Args:
         all_data: 完整的数据字典
         classified_provinces: 按地区分类的省份字典
+        name_mapping: 名称映射字典（用于港澳台英文路径）
         
     Returns:
         地区导航列表的 HTML 字符串
@@ -113,24 +162,41 @@ def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dic
                     region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt>')
             
             elif province_name in [HONG_KONG, MACAO]:
-                # 香港/澳门：列出区域
+                # 香港/澳门：列出区域（使用英文路径）
+                region_key = "香港" if province_name == HONG_KONG else "澳门"
                 regions = list(province_data.keys())
-                region_links = " | ".join([
-                    f'<a href="{province_pinyin}/{to_pinyin(region)}/index.html">{region}</a>'
-                    for region in regions
-                ])
+                region_links = []
+                for region in regions:
+                    # 从映射文件获取区域的英文路径
+                    if region_key in name_mapping and "regions" in name_mapping[region_key]:
+                        if region in name_mapping[region_key]["regions"]:
+                            region_path = name_mapping[region_key]["regions"][region].get("path_slug", to_pinyin(region))
+                        else:
+                            region_path = to_pinyin(region)
+                    else:
+                        region_path = to_pinyin(region)
+                    region_links.append(f'<a href="{province_pinyin}/{region_path}/index.html">{region}</a>')
+                region_links_html = " | ".join(region_links)
                 province_display = simplify_special_region_name(province_name)
-                region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{region_links}</dd>')
+                region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{region_links_html}</dd>')
             
             elif province_name == TAIWAN:
-                # 台湾：列出城市/县
+                # 台湾：列出城市/县（使用英文路径）
                 cities = list(province_data.keys())
-                city_links = " | ".join([
-                    f'<a href="{province_pinyin}/{to_pinyin(city)}/index.html">{city}</a>'
-                    for city in cities
-                ])
+                city_links = []
+                for city in cities:
+                    # 从映射文件获取市/县的英文路径
+                    if "台湾" in name_mapping and "cities_counties" in name_mapping["台湾"]:
+                        if city in name_mapping["台湾"]["cities_counties"]:
+                            city_path = name_mapping["台湾"]["cities_counties"][city].get("path_slug", to_pinyin(city))
+                        else:
+                            city_path = to_pinyin(city)
+                    else:
+                        city_path = to_pinyin(city)
+                    city_links.append(f'<a href="{province_pinyin}/{city_path}/index.html">{city}</a>')
+                city_links_html = " | ".join(city_links)
                 province_display = simplify_province_name(province_name)
-                region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{city_links}</dd>')
+                region_dl_items.append(f'<dt><a href="{province_pinyin}/index.html">{province_display}</a></dt><dd>{city_links_html}</dd>')
             
             else:
                 # 普通省份：列出城市
@@ -162,16 +228,17 @@ def generate_region_nav_list(all_data: Dict[str, Any], classified_provinces: dic
     return "\n                        ".join(nav_items)
 
 
-def generate_root_html(all_data: Dict[str, Any], classified_provinces: dict) -> str:
+def generate_root_html(all_data: Dict[str, Any], classified_provinces: dict, name_mapping: Dict[str, Any]) -> str:
     """
     生成根目录 index.html（所有省份/直辖市的总入口，按地区分类）
     
     Args:
         all_data: 完整的数据字典
         classified_provinces: {地区名称: [(省份名称, 省份拼音), ...], ...}
+        name_mapping: 名称映射字典（用于港澳台英文路径）
     """
     # 生成地区导航列表
-    region_nav_list = generate_region_nav_list(all_data, classified_provinces)
+    region_nav_list = generate_region_nav_list(all_data, classified_provinces, name_mapping)
     
     # 生成 Banner HTML（使用配置中的函数）
     banner_html = generate_banner_html()
@@ -241,10 +308,18 @@ def main():
         print("错误: 没有可用的数据文件")
         return
     
+    # 加载名称映射（用于港澳台英文路径）
+    print("正在加载名称映射文件...")
+    name_mapping = load_name_mapping()
+    
     # 收集所有省份/直辖市/特别行政区信息，用于生成根目录 index.html
     provinces = []
     for province_name in all_data.keys():
-        province_pinyin = to_pinyin(province_name)
+        # 港澳台使用英文路径，其他使用拼音
+        if province_name in [HONG_KONG, MACAO, TAIWAN]:
+            province_pinyin = get_hk_mo_tw_path_slug(province_name, name_mapping)
+        else:
+            province_pinyin = to_pinyin(province_name)
         provinces.append((province_name, province_pinyin))
     
     # 按地区分类
@@ -256,7 +331,7 @@ def main():
     
     # 生成根目录 index.html
     print("生成根目录 index.html...")
-    root_html = generate_root_html(all_data, classified_provinces)
+    root_html = generate_root_html(all_data, classified_provinces, name_mapping)
     write_html_file(OUTPUT_DIR / "index.html", root_html)
     print(f"已生成: 根目录总入口 index.html")
     print(f"包含 {total_count} 个省份/直辖市/特别行政区")

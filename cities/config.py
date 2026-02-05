@@ -463,7 +463,7 @@ GENERATION_SCRIPTS = [
     "generate_root_index.py",
     "generate_municipalities.py",
     # "generate_provinces.py",
-    # "generate_hk_mo_tw.py",
+    "generate_hk_mo_tw.py",
 ]
 
 # ==================== 其他配置 ====================
