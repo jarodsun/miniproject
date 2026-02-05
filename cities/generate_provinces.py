@@ -357,36 +357,44 @@ def generate_street_html(
     district_name: str,
     city_name: str,
     province_name: str,
-    back_path: str = "../"
+    streets: List[Tuple[str, str]],
 ) -> str:
     """
-    生成街道级别 HTML（普通省份专用）
-    street_name: 街道名称
-    district_name: 区名称
-    city_name: 城市名称
-    province_name: 省份名称
-    back_path: 返回上级的路径（用于生成相对链接）
-    """
-    # 生成SEO信息（包含页面标题）
-    seo_context = get_seo_context(page_type="street", street_name=street_name)
+    生成街道级别 HTML（普通省份五级页面）。左侧与首页、省页、市页、区页一致（nav、banner、5 个 list-box），
+    右侧侧栏：复用区页的「本区 + dd 街道」内容。
     
+    Args:
+        street_name: 街道名称
+        district_name: 区名称
+        city_name: 城市名称
+        province_name: 省份名称
+        streets: [(街道名称, 街道拼音), ...] 本区下街道列表，与区页侧栏相同
+    """
+    # 街道页在区目录下一级，侧栏街道链接需用 ../ 回到区目录
+    区页面右侧侧栏 = build_district_sidebar_html(district_name, streets, street_link_prefix="../")
+
+    banner_html = generate_banner_html()
+    product_context = get_product_context(include_products=True)
+    seo_context = get_seo_context(page_type="street", street_name=street_name)
+
     renderer = get_renderer()
     context = {
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
+        "banner": banner_html,
+        "区页面右侧侧栏": 区页面右侧侧栏,
+        "省份名称": province_name,    # 面包屑第二级：省
+        "城市名称": city_name,        # 面包屑第三级：市
+        "区县名称": district_name,    # 面包屑第四级：区县
+        "街道名称": street_name,      # 面包屑第五级：街道
+        **product_context,
         **seo_context,
-        "街道名称": street_name,
-        "区县名称": district_name,
-        "城市名称": city_name,
-        "省份名称": province_name,
-        "区县链接": f"{back_path}index.html",
-        "城市链接": f"{back_path}../index.html",
-        "省份链接": f"{back_path}../../index.html",
     }
-    
+
+    # 使用普通省份街道页面模板（五级页面模板，有5级面包屑）
     html = renderer.render_html(
         head_template=DEFAULT_TEMPLATES["head"],
-        body_template=DEFAULT_TEMPLATES["body_street"],
+        body_template=DEFAULT_TEMPLATES["body_province_street"],
         foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
@@ -480,19 +488,21 @@ def process_province(province_name: str, province_data: Dict[str, Any]):
             write_html_file(district_file, rewrite_asset_prefix(district_html, depth))
             print(f"    已生成: {district_name} 首页")
             
-            # 处理每个街道
+            # 处理每个街道（五级页面）
             for street_name, street_pinyin in streets:
                 street_dir = district_dir / street_pinyin
                 
-                # 生成街道级别 HTML
+                # 生成街道级别 HTML（五级页面）：复用区页侧栏结构
                 street_html = generate_street_html(
                     street_name,
                     district_name,
                     city_name,
                     province_name,
-                    "../"  # back_path
+                    streets,  # 所有街道作为同级节点显示在侧栏
                 )
-                write_html_file(street_dir / "index.html", street_html)
+                street_file = street_dir / "index.html"
+                depth = len(street_file.relative_to(OUTPUT_DIR).parts) - 1
+                write_html_file(street_file, rewrite_asset_prefix(street_html, depth))
                 print(f"      已生成: {street_name} 首页")
 
 

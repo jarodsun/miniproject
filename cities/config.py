@@ -364,6 +364,7 @@ DEFAULT_TEMPLATES = {
     "body_city": "body_city_template.html",
     "body_district": "body_district_template.html",
     "body_street": "body_street_template.html",
+    "body_province_street": "body_province_street_template.html",  # 普通省份街道页面（五级）
 }
 
 # ==================== 资源复制配置 ====================
