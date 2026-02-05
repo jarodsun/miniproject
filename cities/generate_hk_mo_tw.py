@@ -420,6 +420,59 @@ def generate_region_html(region_name: str, province_name: str, districts: List[T
     return html
 
 
+def generate_hk_mo_tw_level4_html(
+    province_name: str,
+    parent_node_name: str,
+    current_node_name: str,
+    siblings: List[Tuple[str, str]],
+) -> str:
+    """
+    生成港澳台四级页面（区页 / 堂区页 / 区乡镇页）HTML：
+    - 左侧与首页、港澳台二级页、三级页完全一致（nav、banner、5 个 list-box）
+    - 右侧侧栏：复用三级页的「本区域/本市县 + dd 下级」内容
+    - 面包屑：首页 > 特别行政区/省 > 区域/市县 > 当前区/堂区/区乡镇
+    
+    Args:
+        province_name: 地区名称（如「香港特别行政区」「澳门特别行政区」「台湾省」）
+        parent_node_name: 上级节点名称（区域名或市/县名，如「香港岛」「台北市」）
+        current_node_name: 当前四级节点名称（区/堂区/区乡镇名，如「中西区」「大安区」）
+        siblings: 同级节点列表 [(节点名称, 节点路径slug), ...]，用于侧栏显示
+    """
+    # 生成右侧侧栏：复用三级页侧栏结构（本区域/本市县 + dd 下级列表）
+    # 注意：四级页面侧栏链接需要相对于四级页面目录（即上级目录）
+    区页面右侧侧栏 = build_hk_mo_tw_level3_sidebar_html(
+        node_name=parent_node_name,
+        children=siblings,
+        child_link_prefix="../",  # 四级页面相对于上级目录，所以链接前缀为 ../
+    )
+    
+    banner_html = generate_banner_html()
+    product_context = get_product_context(include_products=True)
+    seo_context = get_seo_context(page_type="district", district_name=current_node_name)
+    
+    renderer = get_renderer()
+    context = {
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
+        "banner": banner_html,
+        "区页面右侧侧栏": 区页面右侧侧栏,
+        "直辖市名称": province_name,  # 面包屑第二级：特别行政区/省
+        "区县名称": parent_node_name,  # 面包屑第三级：区域/市县
+        "街道名称": current_node_name,  # 面包屑第四级：当前区/堂区/区乡镇
+        **product_context,
+        **seo_context,
+    }
+    
+    # 使用直辖市四级页面（街道页）模板，它有4级面包屑
+    html = renderer.render_html(
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_municipality_street"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
+        context=context
+    )
+    return html
+
+
 def generate_district_only_html(
     district_name: str,
     region_name: str,
@@ -428,7 +481,7 @@ def generate_district_only_html(
     is_region: bool = True
 ) -> str:
     """
-    生成区级别 HTML（用于港澳台的区，没有街道层级）
+    生成区级别 HTML（用于港澳台的区，没有街道层级）- 旧版简单模板
     district_name: 区名称
     region_name: 区域/城市名称
     province_name: 省份/特别行政区名称
@@ -598,17 +651,16 @@ def process_hong_kong_macao(province_name: str, province_data: Dict[str, Any], n
             write_html_file(region_file, rewrite_asset_prefix(region_html, depth))
             print(f"  已生成: {region_name} 首页")
             
-            # 处理每个区（没有街道层级）
+            # 处理每个区（四级页面，没有街道层级）
             for district_name, district_path in districts:
                 district_dir = region_dir / district_path
                 
-                # 生成区级别 HTML（没有街道）
-                district_html = generate_district_only_html(
-                    district_name,
-                    region_name,
-                    province_name,
-                    "../",  # back_path
-                    True  # is_region
+                # 生成四级页面 HTML（区页）：复用三级页侧栏结构
+                district_html = generate_hk_mo_tw_level4_html(
+                    province_name=province_name,
+                    parent_node_name=region_name,
+                    current_node_name=district_name,
+                    siblings=districts,  # 所有区作为同级节点显示在侧栏
                 )
                 district_file = district_dir / "index.html"
                 depth = len(district_file.relative_to(OUTPUT_DIR).parts) - 1
@@ -652,21 +704,20 @@ def process_hong_kong_macao(province_name: str, province_data: Dict[str, Any], n
             write_html_file(region_file, rewrite_asset_prefix(region_html, depth))
             print(f"  已生成: {region_name} 首页")
             
-            # 处理每个堂区（没有街道层级）
+            # 处理每个堂区（四级页面，没有街道层级）
             for parish_name, parish_path in parishes:
                 parish_dir = region_dir / parish_path
                 
-                # 生成堂区级别 HTML（没有街道）
-                district_html = generate_district_only_html(
-                    parish_name,
-                    region_name,
-                    province_name,
-                    "../",  # back_path
-                    True  # is_region
+                # 生成四级页面 HTML（堂区页）：复用三级页侧栏结构
+                parish_html = generate_hk_mo_tw_level4_html(
+                    province_name=province_name,
+                    parent_node_name=region_name,
+                    current_node_name=parish_name,
+                    siblings=parishes,  # 所有堂区作为同级节点显示在侧栏
                 )
                 district_file = parish_dir / "index.html"
                 depth = len(district_file.relative_to(OUTPUT_DIR).parts) - 1
-                write_html_file(district_file, rewrite_asset_prefix(district_html, depth))
+                write_html_file(district_file, rewrite_asset_prefix(parish_html, depth))
                 print(f"    已生成: {parish_name} 首页")
 
 
@@ -725,17 +776,16 @@ def process_taiwan(province_name: str, province_data: Dict[str, Any], name_mappi
         write_html_file(city_file, rewrite_asset_prefix(city_html, depth))
         print(f"  已生成: {city_county_name} 首页")
         
-        # 处理每个区/乡镇（没有街道层级）
+        # 处理每个区/乡镇（四级页面，没有街道层级）
         for district_name, district_path in districts:
             district_dir = city_dir / district_path
             
-            # 生成区级别 HTML（没有街道）
-            district_html = generate_district_only_html(
-                district_name,
-                city_county_name,
-                province_name,
-                "../",  # back_path
-                False  # is_region (台湾是城市，不是区域)
+            # 生成四级页面 HTML（区/乡镇页）：复用三级页侧栏结构
+            district_html = generate_hk_mo_tw_level4_html(
+                province_name=province_name,
+                parent_node_name=city_county_name,
+                current_node_name=district_name,
+                siblings=districts,  # 所有区/乡镇作为同级节点显示在侧栏
             )
             district_file = district_dir / "index.html"
             depth = len(district_file.relative_to(OUTPUT_DIR).parts) - 1
