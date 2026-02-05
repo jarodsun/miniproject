@@ -462,7 +462,7 @@ def simplify_special_region_name(region_name: str) -> str:
 GENERATION_SCRIPTS = [
     "generate_root_index.py",
     "generate_municipalities.py",
-    # "generate_provinces.py",
+    "generate_provinces.py",
     "generate_hk_mo_tw.py",
 ]
 
