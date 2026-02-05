@@ -235,6 +235,107 @@ def generate_hk_mo_tw_html(
     return html
 
 
+def build_hk_mo_tw_level3_sidebar_html(
+    node_name: str,
+    children: List[Tuple[str, str]],
+    child_link_prefix: str = "",
+) -> str:
+    """
+    港澳台三级页面右侧侧栏（区域页 / 市县页）：
+    - 与首页结构一致，无 sidebar-current
+    - address-item-left 为当前节点全称（如 香港岛： / 台北市：）
+    - address-item-right 仅 dd：下级列表（区/堂区/区乡镇），多个用 | 分隔
+
+    Args:
+        node_name: 当前三级节点名称（区域名或市/县名）
+        children: [(下级名称, 下级路径slug), ...]
+        child_link_prefix: 子链接前缀（默认空；用于更深层页面复用时可传 "../"）
+    """
+    nav_items = []
+    for idx, (data_for, label, _) in enumerate(SIDEBAR_PRODUCTS):
+        active_class = "sidebar-nav-active" if idx == 0 else ""
+        nav_items.append(f'<li class="{active_class}" data-for="{data_for}">{label}</li>')
+    nav_list_html = "\n".join(nav_items)
+
+    child_links = " | ".join([
+        f'<a href="{child_link_prefix}{child_slug}/index.html">{child_name}</a>'
+        for child_name, child_slug in children
+    ])
+    dd_content = f"<dd>{child_links}</dd>" if child_links else "<dd></dd>"
+
+    address_lists = []
+    for idx, (data_for, _, _) in enumerate(SIDEBAR_PRODUCTS):
+        active = " active" if idx == 0 else ""
+        block = f"""                <div class="address-list product-{data_for}{active}">
+                    <ul>
+                        <li>
+                            <div class="address-item-left">{node_name}：</div>
+                            <div class="address-item-right">
+                                <dl>
+                                    {dd_content}
+                                </dl>
+                            </div>
+                        </li>
+                    </ul>
+                </div>"""
+        address_lists.append(block)
+    address_lists_html = "\n".join(address_lists)
+
+    sidebar_html = f"""<div class="sidebar">
+            <button class="sidebar-toggle" aria-label="展开地区导航">展开地区导航</button>
+            <div class="sidebar-content">
+                <div class="sidebar-nav-list">
+                    <ul>
+{nav_list_html}
+                    </ul>
+                </div>
+{address_lists_html}
+            </div>
+        </div>"""
+    return sidebar_html
+
+
+def generate_hk_mo_tw_level3_html(
+    province_name: str,
+    node_name: str,
+    children: List[Tuple[str, str]],
+) -> str:
+    """
+    生成港澳台三级页面（区域页 / 市县页）HTML：
+    - 左侧与首页/港澳台二级页一致（nav、banner、5 个 list-box）
+    - 右侧侧栏：本节点全称 + 仅 dd 下级列表
+
+    复用模板 `body_municipality_district_template.html`：
+    - 面包屑：../../index.html -> ../index.html -> 当前节点
+    - 右侧插槽：{{ 区页面右侧侧栏 | safe }}
+    """
+    区页面右侧侧栏 = build_hk_mo_tw_level3_sidebar_html(node_name, children)
+
+    banner_html = generate_banner_html()
+    product_context = get_product_context(include_products=True)
+    seo_context = get_seo_context(page_type="district", district_name=node_name)
+
+    renderer = get_renderer()
+    context = {
+        "当前页面URL地址": DEFAULT_PAGE_URL,
+        "main_site_footer": DEFAULT_FOOTER,
+        "banner": banner_html,
+        "区页面右侧侧栏": 区页面右侧侧栏,
+        "直辖市名称": province_name,  # 复用模板变量名：二级页名称
+        "区县名称": node_name,        # 复用模板变量名：三级节点名称
+        **product_context,
+        **seo_context,
+    }
+
+    html = renderer.render_html(
+        head_template=DEFAULT_TEMPLATES["head"],
+        body_template=DEFAULT_TEMPLATES["body_municipality_district"],
+        foot_template=DEFAULT_TEMPLATES["foot"],
+        context=context
+    )
+    return html
+
+
 def generate_municipality_html(municipality_name: str, districts: List[Tuple[str, str]]) -> str:
     """
     生成特别行政区级别 HTML（用于香港/澳门）
@@ -486,8 +587,12 @@ def process_hong_kong_macao(province_name: str, province_data: Dict[str, Any], n
         for region_name, region_path, districts in regions_with_districts:
             region_dir = province_dir / region_path
             
-            # 生成区域级别 HTML（使用旧函数，保持兼容）
-            region_html = generate_region_html(region_name, province_name, districts)
+            # 生成三级页面 HTML（区域页）：本区域 + 仅 dd 下级区列表
+            region_html = generate_hk_mo_tw_level3_html(
+                province_name=province_name,
+                node_name=region_name,
+                children=districts,
+            )
             region_file = region_dir / "index.html"
             depth = len(region_file.relative_to(OUTPUT_DIR).parts) - 1
             write_html_file(region_file, rewrite_asset_prefix(region_html, depth))
@@ -536,11 +641,12 @@ def process_hong_kong_macao(province_name: str, province_data: Dict[str, Any], n
         for region_name, region_path, parishes in regions_with_parishes:
             region_dir = province_dir / region_path
             
-            # 收集堂区信息（用于生成区域页）
-            districts_for_region = [(pn, pp) for pn, pp in parishes]
-            
-            # 生成区域级别 HTML（使用旧函数，保持兼容）
-            region_html = generate_region_html(region_name, province_name, districts_for_region)
+            # 生成三级页面 HTML（区域页）：本区域 + 仅 dd 下级堂区列表
+            region_html = generate_hk_mo_tw_level3_html(
+                province_name=province_name,
+                node_name=region_name,
+                children=parishes,
+            )
             region_file = region_dir / "index.html"
             depth = len(region_file.relative_to(OUTPUT_DIR).parts) - 1
             write_html_file(region_file, rewrite_asset_prefix(region_html, depth))
@@ -608,11 +714,11 @@ def process_taiwan(province_name: str, province_data: Dict[str, Any], name_mappi
     for city_county_name, city_county_path, districts in cities_counties_with_districts:
         city_dir = province_dir / city_county_path
         
-        # 生成市级别 HTML（使用旧函数，保持兼容）
-        city_html = generate_taiwan_city_html(
-            city_county_name,
-            province_name,
-            districts
+        # 生成三级页面 HTML（市/县页）：本市/县 + 仅 dd 下级区/乡镇列表
+        city_html = generate_hk_mo_tw_level3_html(
+            province_name=province_name,
+            node_name=city_county_name,
+            children=districts,
         )
         city_file = city_dir / "index.html"
         depth = len(city_file.relative_to(OUTPUT_DIR).parts) - 1
