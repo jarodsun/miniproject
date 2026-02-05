@@ -138,42 +138,110 @@ def generate_province_html(
     return html
 
 
+def build_city_sidebar_html(
+    city_name: str,
+    districts_with_streets: List[Tuple[str, str, List[Tuple[str, str]]]],
+) -> str:
+    """
+    市页右侧侧栏：与首页/省页结构一致；address-item-left 用「本市全称」（如石家庄市：）；
+    address-item-right 使用 dt 放区县，dd 放街道（与省页面结构一致，层级递进）。
+    
+    Args:
+        city_name: 市名称（如「石家庄市」「广州市」）
+        districts_with_streets: [(区县名称, 区县拼音, [(街道名称, 街道拼音), ...]), ...]
+    """
+    nav_items = []
+    for idx, (data_for, label, _) in enumerate(SIDEBAR_PRODUCTS):
+        active_class = "sidebar-nav-active" if idx == 0 else ""
+        nav_items.append(f'<li class="{active_class}" data-for="{data_for}">{label}</li>')
+    nav_list_html = "\n".join(nav_items)
+
+    # 生成 dt/dd 内容：dt 区县，dd 该区县下街道
+    dt_dd_parts = []
+    for district_name, district_pinyin, streets in districts_with_streets:
+        dt_part = f'<dt><a href="{district_pinyin}/index.html">{district_name}</a></dt>'
+        street_links = " | ".join([
+            f'<a href="{district_pinyin}/{street_pinyin}/index.html">{street_name}</a>'
+            for street_name, street_pinyin in streets
+        ])
+        dd_part = f"<dd>{street_links}</dd>" if street_links else "<dd></dd>"
+        dt_dd_parts.append(dt_part + dd_part)
+    dl_content = "".join(dt_dd_parts)
+
+    address_lists = []
+    for idx, (data_for, _, _) in enumerate(SIDEBAR_PRODUCTS):
+        active = " active" if idx == 0 else ""
+        block = f"""                <div class="address-list product-{data_for}{active}">
+                    <ul>
+                        <li>
+                            <div class="address-item-left">{city_name}：</div>
+                            <div class="address-item-right">
+                                <dl>
+                                    {dl_content}
+                                </dl>
+                            </div>
+                        </li>
+                    </ul>
+                </div>"""
+        address_lists.append(block)
+    address_lists_html = "\n".join(address_lists)
+
+    sidebar_html = f"""<div class="sidebar">
+            <button class="sidebar-toggle" aria-label="展开地区导航">展开地区导航</button>
+            <div class="sidebar-content">
+                <div class="sidebar-nav-list">
+                    <ul>
+{nav_list_html}
+                    </ul>
+                </div>
+{address_lists_html}
+            </div>
+        </div>"""
+    return sidebar_html
+
+
+# 类型定义：市下区县及街道
+DistrictsWithStreets = List[Tuple[str, str, List[Tuple[str, str]]]]
+
+
 def generate_city_html(
     city_name: str,
     province_name: str,
     province_pinyin: str,
-    districts: List[Tuple[str, str]]
+    districts_with_streets: DistrictsWithStreets,
 ) -> str:
     """
-    生成市级别 HTML
-    city_name: 城市名称
-    province_name: 省份名称
-    province_pinyin: 省份拼音
-    districts: [(区名称, 区拼音), ...]
+    生成市级别 HTML（三级页面）。左侧与首页、省页一致（nav、banner、5 个 list-box），
+    右侧侧栏：本市全称 + dt 区县、dd 街道。
+    
+    Args:
+        city_name: 城市名称
+        province_name: 省份名称
+        province_pinyin: 省份拼音
+        districts_with_streets: [(区县名称, 区县拼音, [(街道名称, 街道拼音), ...]), ...]
     """
-    # 生成下级列表 HTML
-    district_list_html = "\n".join([
-        f'        <li><a href="{district_pinyin}/index.html">{district_name}</a></li>'
-        for district_name, district_pinyin in districts
-    ])
-    
-    # 生成SEO信息（包含页面标题）
+    # 生成右侧侧栏：本市全称 + dt 区县、dd 街道
+    区页面右侧侧栏 = build_city_sidebar_html(city_name, districts_with_streets)
+
+    banner_html = generate_banner_html()
+    product_context = get_product_context(include_products=True)
     seo_context = get_seo_context(page_type="city", city_name=city_name)
-    
+
     renderer = get_renderer()
     context = {
         "当前页面URL地址": DEFAULT_PAGE_URL,
         "main_site_footer": DEFAULT_FOOTER,
+        "banner": banner_html,
+        "区页面右侧侧栏": 区页面右侧侧栏,
+        "直辖市名称": province_name,  # 复用模板变量名：省名称
+        "区县名称": city_name,        # 复用模板变量名：市名称
+        **product_context,
         **seo_context,
-        "城市名称": city_name,
-        "省份名称": province_name,
-        "省份链接": "../index.html",
-        "下级列表": district_list_html,
     }
-    
+
     html = renderer.render_html(
         head_template=DEFAULT_TEMPLATES["head"],
-        body_template=DEFAULT_TEMPLATES["body_city"],
+        body_template=DEFAULT_TEMPLATES["body_municipality_district"],  # 使用与直辖市区页相同的模板
         foot_template=DEFAULT_TEMPLATES["foot"],
         context=context
     )
@@ -279,13 +347,33 @@ def process_province(province_name: str, province_data: Dict[str, Any]):
     
     # 收集所有城市及区县信息（用于生成省份页面侧栏）
     cities_with_districts: CitiesWithDistricts = []
+    # 同时收集城市-区县-街道完整信息（用于生成市页面侧栏）
+    cities_with_full_data: Dict[str, Any] = {}
+    
     for city_name, districts_data in province_data.items():
         city_pinyin = to_pinyin(city_name)
         districts = []
-        for district_name in districts_data.keys():
+        districts_with_streets: DistrictsWithStreets = []
+        
+        for district_name, streets_list in districts_data.items():
             district_pinyin = to_pinyin(district_name)
             districts.append((district_name, district_pinyin))
+            
+            # 收集街道信息
+            streets = []
+            for street_name in streets_list:
+                street_pinyin = to_pinyin(street_name)
+                streets.append((street_name, street_pinyin))
+            
+            districts_with_streets.append((district_name, district_pinyin, streets))
+        
         cities_with_districts.append((city_name, city_pinyin, districts))
+        cities_with_full_data[city_name] = {
+            "pinyin": city_pinyin,
+            "districts": districts,
+            "districts_with_streets": districts_with_streets,
+            "districts_data": districts_data,
+        }
     
     # 生成省级别 HTML（与直辖市页面结构一致，带 banner 和侧栏）
     province_html = generate_province_html(province_name, cities_with_districts)
@@ -295,18 +383,23 @@ def process_province(province_name: str, province_data: Dict[str, Any]):
     print(f"已生成: {province_name} 首页")
     
     # 处理每个城市
-    for city_name, city_pinyin, districts in cities_with_districts:
+    for city_name, city_info in cities_with_full_data.items():
+        city_pinyin = city_info["pinyin"]
+        districts = city_info["districts"]
+        districts_with_streets = city_info["districts_with_streets"]
+        districts_data = city_info["districts_data"]
         city_dir = province_dir / city_pinyin
-        districts_data = province_data[city_name]
         
-        # 生成市级别 HTML
+        # 生成市级别 HTML（三级页面）：本市全称 + dt 区县、dd 街道
         city_html = generate_city_html(
             city_name,
             province_name,
             province_pinyin,
-            districts
+            districts_with_streets
         )
-        write_html_file(city_dir / "index.html", city_html)
+        city_file = city_dir / "index.html"
+        depth = len(city_file.relative_to(OUTPUT_DIR).parts) - 1
+        write_html_file(city_file, rewrite_asset_prefix(city_html, depth))
         print(f"  已生成: {city_name} 首页")
         
         # 处理每个区县
